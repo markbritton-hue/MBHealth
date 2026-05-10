@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -18,8 +18,8 @@
     --border:   rgba(99,140,210,0.12);
     --border2:  rgba(99,140,210,0.22);
     --text:  #e8eef8;
-    --text2: #8fa3c4;
-    --text3: #4d6488;
+    --text2: #d0dff5;
+    --text3: #b0c4e0;
     --green: #22d47a;
     --amber: #f5a623;
     --red:   #f05252;
@@ -53,13 +53,13 @@
     padding: 36px 0 28px; border-bottom: 1px solid var(--border);
     margin-bottom: 28px; flex-wrap: wrap; gap: 16px;
   }
-  .pt-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.18em; color:var(--text3); text-transform:uppercase; margin-bottom:4px; }
+  .pt-label { font-family:'DM Mono',monospace; font-size:13px; letter-spacing:.18em; color:var(--text3); text-transform:uppercase; margin-bottom:4px; }
   .pt-name  { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; letter-spacing:-0.5px; }
   .pt-meta  { display:flex; gap:18px; margin-top:6px; flex-wrap:wrap; }
-  .pt-meta span { font-family:'DM Mono',monospace; font-size:11px; color:var(--text2); }
+  .pt-meta span { font-family:'DM Mono',monospace; font-size:13px; color:var(--text2); }
   .pt-meta span em { color:var(--text3); font-style:normal; margin-right:5px; }
   .hdr-right { text-align:right; }
-  .hdr-right .updated { font-family:'DM Mono',monospace; font-size:11px; color:var(--text3); }
+  .hdr-right .updated { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); }
   .hdr-right .updated strong { color:var(--blue); }
 
   /* ALERTS */
@@ -69,12 +69,12 @@
     display:flex; gap:12px; align-items:flex-start;
   }
   .alerts-icon { font-size:15px; margin-top:1px; flex-shrink:0; }
-  .alerts-title { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--red); margin-bottom:8px; }
+  .alerts-title { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--red); margin-bottom:8px; }
   .chips { display:flex; flex-wrap:wrap; gap:7px; }
   .chip {
     background:rgba(240,82,82,0.09); border:1px solid rgba(240,82,82,0.22);
     border-radius:4px; padding:3px 9px;
-    font-family:'DM Mono',monospace; font-size:10.5px; color:#f8a0a0;
+    font-family:'DM Mono',monospace; font-size:13px; color:#f8a0a0;
     display:flex; align-items:center; gap:5px;
   }
   .chip .dot { width:5px; height:5px; border-radius:50%; background:var(--red); flex-shrink:0; }
@@ -90,7 +90,7 @@
   .tab {
     flex-shrink:0; padding:9px 18px; border-radius:7px; border:none;
     background:transparent; color:var(--text3);
-    font-family:'Syne',sans-serif; font-size:11.5px; font-weight:600;
+    font-family:'Syne',sans-serif; font-size:14px; font-weight:600;
     letter-spacing:.08em; text-transform:uppercase;
     cursor:pointer; transition:all .18s; white-space:nowrap;
     display:flex; align-items:center; gap:7px;
@@ -108,7 +108,7 @@
   .sec-hdr { display:flex; align-items:baseline; gap:12px; margin-bottom:18px; padding-bottom:10px; border-bottom:1px solid var(--border); margin-top:0; }
   .sec-hdr + .sec-hdr { margin-top:36px; }
   .sec-title { font-family:'Syne',sans-serif; font-size:17px; font-weight:700; }
-  .sec-sub   { font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); }
+  .sec-sub   { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); }
 
   /* OVERVIEW GRID */
   .overview-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:13px; margin-bottom:32px; }
@@ -124,10 +124,10 @@
   .hcard.sw::before { background:var(--amber); }
   .hcard-lbl  { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:#fff; margin-bottom:7px; }
   .hcard-val  { font-family:'Syne',sans-serif; font-size:26px; font-weight:800; line-height:1; margin-bottom:3px; letter-spacing:-0.5px; }
-  .hcard-unit { font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); margin-bottom:9px; }
+  .hcard-unit { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); margin-bottom:9px; }
   .hcard-foot { display:flex; align-items:center; justify-content:space-between; }
-  .hcard-range{ font-family:'DM Mono',monospace; font-size:9px; color:var(--text3); text-align:right; }
-  .badge { font-family:'DM Mono',monospace; font-size:10px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; padding:3px 8px; border-radius:4px; }
+  .hcard-range{ font-family:'DM Mono',monospace; font-size:14px; color:var(--text3); text-align:right; }
+  .badge { font-family:'DM Mono',monospace; font-size:13px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; padding:3px 8px; border-radius:4px; }
   .badge.n { background:rgba(34,212,122,.1);  color:var(--green); border:1px solid rgba(34,212,122,.2); }
   .badge.h { background:rgba(240,82,82,.1);   color:var(--red);   border:1px solid rgba(240,82,82,.2); }
   .badge.w { background:rgba(245,166,35,.11); color:var(--amber); border:1px solid rgba(245,166,35,.22); }
@@ -140,8 +140,8 @@
   }
   .ccard.a { border-color:rgba(245,166,35,.15); border-left-color:var(--amber); }
   .ccard-title { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:7px; }
-  .ccard-desc  { font-size:12px; color:var(--text2); line-height:1.65; }
-  .ccard-val   { margin-top:9px; font-family:'DM Mono',monospace; font-size:11px; color:var(--red); }
+  .ccard-desc  { font-size:14px; color:var(--text2); line-height:1.65; }
+  .ccard-val   { margin-top:9px; font-family:'DM Mono',monospace; font-size:13px; color:var(--red); }
   .ccard.a .ccard-val { color:var(--amber); }
 
   /* CHART CARDS */
@@ -155,27 +155,27 @@
     padding:16px 18px 12px; border-bottom:1px solid var(--border);
   }
   .cc-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; }
-  .cc-sub   { font-family:'DM Mono',monospace; font-size:9.5px; color:var(--text3); margin-top:2px; }
+  .cc-sub   { font-family:'DM Mono',monospace; font-size:14px; color:var(--text3); margin-top:2px; }
   .cc-latest { text-align:right; }
   .cc-val  { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; line-height:1; }
-  .cc-date { font-family:'DM Mono',monospace; font-size:9px; color:var(--text3); margin-top:3px; }
+  .cc-date { font-family:'DM Mono',monospace; font-size:14px; color:var(--text3); margin-top:3px; }
   .cc-body { padding:14px 18px; }
   .cc-wrap { position:relative; height:175px; }
   .cc-foot {
     padding:10px 18px; border-top:1px solid var(--border);
     background:var(--bg2); display:flex; align-items:center; justify-content:space-between;
   }
-  .cc-range { font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); }
-  .cc-trend { font-family:'DM Mono',monospace; font-size:10px; }
+  .cc-range { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); }
+  .cc-trend { font-family:'DM Mono',monospace; font-size:13px; }
 
   /* SINGLE RESULT */
   .singles { display:flex; gap:18px; flex-wrap:wrap; }
   .sresult { background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:26px; max-width:440px; }
-  .sr-lbl  { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:9px; }
+  .sr-lbl  { font-family:'DM Mono',monospace; font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:9px; }
   .sr-val  { font-family:'Syne',sans-serif; font-size:50px; font-weight:800; line-height:1; letter-spacing:-2px; margin-bottom:3px; }
-  .sr-unit { font-family:'DM Mono',monospace; font-size:11px; color:var(--text3); margin-bottom:14px; }
-  .sr-range{ font-family:'DM Mono',monospace; font-size:11px; color:var(--text3); padding-top:13px; border-top:1px solid var(--border); }
-  .sr-desc { font-size:12px; color:var(--text2); line-height:1.65; margin-top:8px; }
+  .sr-unit { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); margin-bottom:14px; }
+  .sr-range{ font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); padding-top:13px; border-top:1px solid var(--border); }
+  .sr-desc { font-size:14px; color:var(--text2); line-height:1.65; margin-top:8px; }
 
   /* ── KETO ANALYTICS ────────────────────────── */
   .keto-intro {
@@ -192,9 +192,9 @@
   .ir-gauge-wrap  { display:flex; flex-direction:column; align-items:center; gap:8px; flex-shrink:0; }
   .ir-gauge-label { text-align:center; }
   .ir-gauge-level { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; }
-  .ir-gauge-sub   { font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); }
+  .ir-gauge-sub   { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); }
   .ir-signals     { display:flex; flex-direction:column; gap:9px; flex:1; min-width:280px; }
-  .ir-signal      { display:flex; gap:10px; align-items:flex-start; padding:10px 13px; border-radius:8px; font-size:12px; line-height:1.55; }
+  .ir-signal      { display:flex; gap:10px; align-items:flex-start; padding:10px 13px; border-radius:8px; font-size:14px; line-height:1.55; }
   .ir-signal.bad     { background:rgba(240,82,82,0.07);  border:1px solid rgba(240,82,82,0.15);  color:var(--text2); }
   .ir-signal.warn    { background:rgba(245,166,35,0.07); border:1px solid rgba(245,166,35,0.15); color:var(--text2); }
   .ir-signal.good    { background:rgba(34,212,122,0.07); border:1px solid rgba(34,212,122,0.15); color:var(--text2); }
@@ -209,21 +209,21 @@
   .ratio-heroes { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
   .ratio-hero   { background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:20px; }
   .ratio-hero.missing-ratio { border-color:rgba(192,132,252,0.2); }
-  .ratio-hero-name { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:8px; }
+  .ratio-hero-name { font-family:'DM Mono',monospace; font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:8px; }
   .ratio-hero-val  { font-family:'Syne',sans-serif; font-size:38px; font-weight:800; line-height:1; letter-spacing:-1px; margin-bottom:4px; }
-  .ratio-hero-context { font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); margin-bottom:14px; }
+  .ratio-hero-context { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); margin-bottom:14px; }
   .ratio-hero-scale { margin-bottom:12px; }
   .rhs-bar     { position:relative; height:8px; background:rgba(99,140,210,0.1); border-radius:4px; }
   .rhs-fill    { height:100%; border-radius:4px; transition:width .5s ease; }
-  .rhs-marker  { position:absolute; top:12px; font-family:'DM Mono',monospace; font-size:9px; transform:translateX(-50%); }
+  .rhs-marker  { position:absolute; top:12px; font-family:'DM Mono',monospace; font-size:14px; transform:translateX(-50%); }
   .rhs-marker.optimal { color:var(--green); }
   .rhs-marker.danger  { color:var(--red); }
   .ratio-hero-targets { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px; }
-  .rt { font-family:'DM Mono',monospace; font-size:9px; padding:2px 7px; border-radius:3px; }
+  .rt { font-family:'DM Mono',monospace; font-size:14px; padding:2px 7px; border-radius:3px; }
   .rt.green  { background:rgba(34,212,122,0.1);  color:var(--green); border:1px solid rgba(34,212,122,0.2); }
   .rt.amber  { background:rgba(245,166,35,0.1);  color:var(--amber); border:1px solid rgba(245,166,35,0.2); }
   .rt.red    { background:rgba(240,82,82,0.1);   color:var(--red);   border:1px solid rgba(240,82,82,0.2); }
-  .ratio-hero-note { font-size:11.5px; color:var(--text2); line-height:1.6; border-top:1px solid var(--border); padding-top:10px; margin-top:10px; }
+  .ratio-hero-note { font-size:14px; color:var(--text2); line-height:1.6; border-top:1px solid var(--border); padding-top:10px; margin-top:10px; }
 
   /* Doctor Cards */
   .doctor-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(420px,1fr)); gap:18px; }
@@ -232,7 +232,7 @@
   .doc-body     { flex:1; }
   .doc-name     { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--text); margin-bottom:12px; }
   .doc-points   { display:flex; flex-direction:column; gap:8px; }
-  .doc-point    { font-size:12px; color:var(--text2); line-height:1.6; padding:9px 12px; border-radius:7px; border-left:3px solid; }
+  .doc-point    { font-size:14px; color:var(--text2); line-height:1.6; padding:9px 12px; border-radius:7px; border-left:3px solid; }
   .doc-point.red    { background:rgba(240,82,82,0.06);  border-left-color:var(--red); }
   .doc-point.amber  { background:rgba(245,166,35,0.06); border-left-color:var(--amber); }
   .doc-point.green  { background:rgba(34,212,122,0.06); border-left-color:var(--green); }
@@ -243,14 +243,14 @@
   .missing-card.priority-1 { border-top-color:var(--red); }
   .missing-card.priority-2 { border-top-color:var(--amber); }
   .missing-card.priority-3 { border-top-color:var(--blue); }
-  .missing-priority { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:5px; }
+  .missing-priority { font-family:'DM Mono',monospace; font-size:14px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:5px; }
   .priority-1 .missing-priority { color:var(--red); }
   .priority-2 .missing-priority { color:var(--amber); }
   .priority-3 .missing-priority { color:var(--blue); }
   .missing-name   { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color:var(--text); margin-bottom:2px; }
-  .missing-unit   { font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); margin-bottom:8px; }
-  .missing-target { font-family:'DM Mono',monospace; font-size:10px; color:var(--text2); margin-bottom:10px; padding:5px 8px; background:rgba(99,140,210,0.07); border-radius:5px; }
-  .missing-why    { font-size:12px; color:var(--text2); line-height:1.62; border-top:1px solid var(--border); padding-top:10px; }
+  .missing-unit   { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); margin-bottom:8px; }
+  .missing-target { font-family:'DM Mono',monospace; font-size:13px; color:var(--text2); margin-bottom:10px; padding:5px 8px; background:rgba(99,140,210,0.07); border-radius:5px; }
+  .missing-why    { font-size:14px; color:var(--text2); line-height:1.62; border-top:1px solid var(--border); padding-top:10px; }
 
   /* ── ECG MONITOR ────────────────────────── */
   .ecg-alert-banner {
@@ -269,9 +269,9 @@
     background:var(--surface); border:1px solid var(--border); border-radius:10px;
     padding:14px 18px; flex:1; min-width:160px;
   }
-  .ecg-meta-label { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:5px; }
+  .ecg-meta-label { font-family:'DM Mono',monospace; font-size:14px; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:5px; }
   .ecg-meta-val   { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color:var(--text); }
-  .ecg-meta-sub   { font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); margin-top:2px; }
+  .ecg-meta-sub   { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); margin-top:2px; }
 
   .ecg-conclusions { display:flex; flex-direction:column; gap:10px; margin-bottom:28px; }
   .ecg-conclusion  {
@@ -292,11 +292,11 @@
     padding:16px 18px;
   }
   .hr-stat-title  { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
-  .hrsb-pct       { font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); font-weight:400; }
+  .hrsb-pct       { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); font-weight:400; }
   .hr-stat-rows   { display:flex; flex-direction:column; gap:7px; }
   .hr-stat-row    {
     display:flex; align-items:center; justify-content:space-between;
-    font-family:'DM Mono',monospace; font-size:11px; color:var(--text3);
+    font-family:'DM Mono',monospace; font-size:13px; color:var(--text3);
     border-bottom:1px solid var(--border); padding-bottom:7px; gap:8px;
   }
   .hr-stat-row:last-child { border-bottom:none; padding-bottom:0; }
@@ -304,7 +304,7 @@
   .hr-val.warn    { color:var(--amber); }
   .hr-val.ok      { color:var(--green); }
   .hr-val.crit    { color:var(--red); }
-  .hr-date        { font-size:9.5px; color:var(--text3); white-space:nowrap; }
+  .hr-date        { font-size:14px; color:var(--text3); white-space:nowrap; }
 
   .ecg-charts-row { display:flex; gap:18px; flex-wrap:wrap; margin-bottom:28px; }
   .ecg-chart-card {
@@ -312,12 +312,12 @@
     padding:18px; min-width:260px;
   }
   .ecg-chart-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; }
-  .ecg-chart-sub   { font-family:'DM Mono',monospace; font-size:9.5px; color:var(--text3); margin-top:3px; }
+  .ecg-chart-sub   { font-family:'DM Mono',monospace; font-size:14px; color:var(--text3); margin-top:3px; }
 
   .beat-legend { display:flex; flex-direction:column; gap:7px; margin-top:14px; }
   .beat-leg-row{
     display:flex; align-items:center; gap:9px;
-    font-family:'DM Mono',monospace; font-size:11px; color:var(--text2);
+    font-family:'DM Mono',monospace; font-size:13px; color:var(--text2);
   }
   .blr-dot    { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
   .blr-val    { margin-left:auto; color:var(--text); font-weight:500; }
@@ -325,10 +325,10 @@
   .event-table-wrap { overflow-x:auto; margin-bottom:28px; }
   .event-table {
     width:100%; border-collapse:collapse;
-    font-family:'DM Mono',monospace; font-size:11.5px; color:var(--text2);
+    font-family:'DM Mono',monospace; font-size:14px; color:var(--text2);
   }
   .event-table th {
-    text-align:left; padding:9px 14px; font-size:9.5px; letter-spacing:.1em;
+    text-align:left; padding:9px 14px; font-size:14px; letter-spacing:.1em;
     text-transform:uppercase; color:var(--text3); border-bottom:1px solid var(--border);
     background:var(--bg2);
   }
@@ -338,7 +338,7 @@
   .ev-serious td { background:rgba(240,82,82,0.03); }
   .ev-badge {
     display:inline-block; padding:2px 8px; border-radius:4px;
-    font-size:9.5px; font-weight:500; letter-spacing:.07em; text-transform:uppercase;
+    font-size:14px; font-weight:500; letter-spacing:.07em; text-transform:uppercase;
   }
   .ev-badge.serious { background:rgba(240,82,82,0.12);  color:var(--red);   border:1px solid rgba(240,82,82,0.22); }
   .ev-badge.stable  { background:rgba(34,212,122,0.08); color:var(--green); border:1px solid rgba(34,212,122,0.18); }
@@ -353,7 +353,7 @@
   .ecg-ctx-card.ctx-warning { border-top-color:var(--amber); }
   .ecg-ctx-card.ctx-info    { border-top-color:var(--blue); }
   .ecg-ctx-title { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; margin-bottom:8px; color:var(--text); }
-  .ecg-ctx-body  { font-size:12px; color:var(--text2); line-height:1.65; }
+  .ecg-ctx-body  { font-size:14px; color:var(--text2); line-height:1.65; }
   .ecg-ctx-body strong { color:var(--text); }
 
   /* ── GLUCOSE TRACKER PAGE ─────────────────── */
@@ -364,18 +364,18 @@
     border:1px solid rgba(240,82,82,0.15); border-radius:14px;
     padding:22px 26px; margin-bottom:22px;
   }
-  .gt-page-eyebrow { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:.15em; text-transform:uppercase; color:var(--text3); margin-bottom:5px; }
+  .gt-page-eyebrow { font-family:'DM Mono',monospace; font-size:14px; letter-spacing:.15em; text-transform:uppercase; color:var(--text3); margin-bottom:5px; }
   .gt-page-title   { font-family:'Syne',sans-serif; font-size:26px; font-weight:800; letter-spacing:-0.5px; margin-bottom:4px; }
-  .gt-page-sub     { font-size:12px; color:var(--text2); }
+  .gt-page-sub     { font-size:14px; color:var(--text2); }
   .gt-targets      { display:flex; flex-direction:column; gap:6px; align-items:flex-end; }
   .gt-target-row   { display:flex; gap:12px; align-items:center; }
-  .gt-target-lbl   { font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); }
-  .gt-target-val   { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; }
+  .gt-target-lbl   { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); }
+  .gt-target-val   { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; }
 
-  .gt-tir-label  { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:6px; }
+  .gt-tir-label  { font-family:'DM Mono',monospace; font-size:14px; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:6px; }
   .gt-tir-bar    { height:14px; border-radius:7px; overflow:hidden; display:flex; margin-bottom:6px; }
   .gt-tir-legend { display:flex; gap:16px; flex-wrap:wrap; }
-  .gt-tir-legend span { font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); display:flex; align-items:center; gap:5px; }
+  .gt-tir-legend span { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); display:flex; align-items:center; gap:5px; }
 
   .gt-main-layout { display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start; margin-bottom:10px; }
   .gt-log-col     { flex:0 0 380px; min-width:300px; display:flex; flex-direction:column; gap:14px; }
@@ -385,14 +385,14 @@
 
   .gt-today-card  { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; }
   .gt-today-title { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; margin-bottom:12px; color:var(--text); }
-  .gt-today-row   { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border); font-family:'DM Mono',monospace; font-size:11px; color:var(--text3); }
+  .gt-today-row   { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border); font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); }
   .gt-today-row:last-child { border-bottom:none; }
-  .gt-today-spike { font-size:10px; color:var(--text3); margin-left:6px; }
+  .gt-today-spike { font-size:13px; color:var(--text3); margin-left:6px; }
 
   .gt-empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px; text-align:center; }
   .gt-empty-icon  { font-size:40px; margin-bottom:12px; opacity:.4; }
   .gt-empty-title { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color:var(--text3); margin-bottom:6px; }
-  .gt-empty-sub   { font-family:'DM Mono',monospace; font-size:11px; color:var(--text3); }
+  .gt-empty-sub   { font-family:'DM Mono',monospace; font-size:13px; color:var(--text3); }
 
   /* ── DAILY GLUCOSE TRACKER ────────────────── */
   .mg-input-card {
@@ -402,8 +402,8 @@
   .mg-input-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; margin-bottom:16px; color:var(--text); }
   .mg-top-row  { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
   .mg-field    { display:flex; flex-direction:column; gap:5px; }
-  .mg-label    { font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); }
-  .mg-unit     { color:var(--text3); font-size:9px; margin-left:4px; }
+  .mg-label    { font-family:'DM Mono',monospace; font-size:14px; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); }
+  .mg-unit     { color:var(--text3); font-size:14px; margin-left:4px; }
   .mg-input {
     background:var(--bg2); border:1px solid var(--border2); border-radius:7px;
     padding:9px 12px; color:var(--text); font-family:'DM Mono',monospace; font-size:13px;
@@ -419,8 +419,8 @@
     background:var(--bg3); border:1px solid var(--border); border-radius:9px;
     padding:11px 12px;
   }
-  .mg-slot-label { font-family:'Syne',sans-serif; font-size:11px; font-weight:600; color:var(--text); margin-bottom:2px; }
-  .mg-slot-sub   { font-family:'DM Mono',monospace; font-size:9px; color:var(--text3); margin-bottom:8px; }
+  .mg-slot-label { font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--text); margin-bottom:2px; }
+  .mg-slot-sub   { font-family:'DM Mono',monospace; font-size:14px; color:var(--text3); margin-bottom:8px; }
   .mg-slot-input {
     width:100%; background:var(--bg2); border:1px solid var(--border); border-radius:6px;
     padding:7px 10px; color:var(--text); font-family:'DM Mono',monospace; font-size:14px;
@@ -431,11 +431,11 @@
   .mg-btn-row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
   .mg-btn {
     background:var(--blue); color:#fff; border:none; border-radius:8px;
-    padding:10px 22px; font-family:'Syne',sans-serif; font-size:12px; font-weight:700;
+    padding:10px 22px; font-family:'Syne',sans-serif; font-size:14px; font-weight:700;
     letter-spacing:.05em; cursor:pointer; transition:opacity .15s;
   }
   .mg-btn:hover { opacity:.85; }
-  .mg-feedback  { font-family:'DM Mono',monospace; font-size:11px; color:var(--green); }
+  .mg-feedback  { font-family:'DM Mono',monospace; font-size:13px; color:var(--green); }
 
   .mg-stats {
     display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px;
@@ -445,9 +445,9 @@
     background:var(--surface); border:1px solid var(--border); border-radius:11px;
     padding:14px 16px;
   }
-  .mg-stat-lbl { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:5px; }
+  .mg-stat-lbl { font-family:'DM Mono',monospace; font-size:14px; letter-spacing:.12em; text-transform:uppercase; color:var(--text3); margin-bottom:5px; }
   .mg-stat-val { font-family:'Syne',sans-serif; font-size:24px; font-weight:800; line-height:1; color:var(--text); margin-bottom:3px; }
-  .mg-stat-sub { font-family:'DM Mono',monospace; font-size:9px; color:var(--text3); }
+  .mg-stat-sub { font-family:'DM Mono',monospace; font-size:14px; color:var(--text3); }
 
   .mg-charts-row { display:flex; gap:16px; flex-wrap:wrap; }
   .mg-chart-card {
@@ -458,16 +458,16 @@
   .mg-chart-header { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
   .mg-chart-title  { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; }
   .mg-chart-legend { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
-  .mg-chart-legend span { font-family:'DM Mono',monospace; font-size:9.5px; color:var(--text3); }
+  .mg-chart-legend span { font-family:'DM Mono',monospace; font-size:14px; color:var(--text3); }
   .mg-leg-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; vertical-align:middle; }
 
   .mg-table-scroll { overflow-x:auto; }
   .mg-table {
     width:100%; border-collapse:collapse;
-    font-family:'DM Mono',monospace; font-size:11px; color:var(--text2);
+    font-family:'DM Mono',monospace; font-size:13px; color:var(--text2);
   }
   .mg-table th {
-    text-align:left; padding:8px 12px; font-size:9.5px; letter-spacing:.1em;
+    text-align:left; padding:8px 12px; font-size:14px; letter-spacing:.1em;
     text-transform:uppercase; color:var(--text3); border-bottom:1px solid var(--border);
     background:var(--bg2); white-space:nowrap;
   }
@@ -580,6 +580,7 @@
     <div class="hcard sw"><div class="hcard-lbl">ApoB</div><div class="hcard-val" style="color:var(--amber)">108</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge w">High</span><div class="hcard-range">Optimal: &lt;90</div></div></div>
     <div class="hcard sn"><div class="hcard-lbl">HDL</div><div class="hcard-val" style="color:var(--green)">51</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal ↑</span><div class="hcard-range">Normal: &gt;39</div></div></div>
     <div class="hcard sn"><div class="hcard-lbl">Triglycerides</div><div class="hcard-val" style="color:var(--green)">97</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal ↓↓</span><div class="hcard-range">Normal: &lt;150</div></div></div>
+    <div class="hcard sw"><div class="hcard-lbl">Trig / HDL Ratio</div><div class="hcard-val" style="color:var(--amber)">1.90</div><div class="hcard-unit">97 ÷ 51 · Apr 2026</div><div class="hcard-foot"><span class="badge w">Above Optimal</span><div class="hcard-range">Optimal: &lt;1.5</div></div></div>
     <div class="hcard sn"><div class="hcard-lbl">WBC</div><div class="hcard-val" style="color:var(--green)">6.7</div><div class="hcard-unit">X10⁹/L · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: 4.0–11.0</div></div></div>
     <div class="hcard sn"><div class="hcard-lbl">eGFR</div><div class="hcard-val" style="color:var(--green)">85</div><div class="hcard-unit">mL/min · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: &gt;60</div></div></div>
     <div class="hcard sn"><div class="hcard-lbl">TSH</div><div class="hcard-val" style="color:var(--green)">1.36</div><div class="hcard-unit">u[iU]/mL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: 0.27–4.20</div></div></div>
