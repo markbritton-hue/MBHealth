@@ -545,6 +545,7 @@ onSnapshot(collection(db, COLL), snap => {
   <button class="tab"         onclick="showTab(event,'ecg')">     <span class="tab-dot" style="background:#ef4444"></span>ECG Monitor</button>
   <button class="tab"         onclick="showTab(event,'keto')">    <span class="tab-dot" style="background:#c084fc"></span>Keto Analytics</button>
   <button class="tab"         onclick="showTab(event,'visit')">   <span class="tab-dot" style="background:#38bdf8"></span>May 11 Visit</button>
+  <button class="tab"         onclick="showTab(event,'fasting')"> <span class="tab-dot" style="background:#a78bfa"></span>Fasting</button>
 </div>
 
 <!-- ALERTS -->
@@ -1668,6 +1669,62 @@ onSnapshot(collection(db, COLL), snap => {
 
 </div><!-- /panel-visit -->
 
+<!-- ══ FASTING ══ -->
+<div class="panel" id="panel-fasting">
+
+  <!-- Hero timer -->
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px 28px;margin-bottom:28px;background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(79,142,247,0.06));border:1px solid rgba(167,139,250,0.2);border-radius:16px;">
+
+    <!-- SVG progress ring -->
+    <div style="position:relative;width:220px;height:220px;margin-bottom:20px;">
+      <svg width="220" height="220" style="transform:rotate(-90deg)">
+        <circle cx="110" cy="110" r="96" fill="none" stroke="rgba(167,139,250,0.12)" stroke-width="14"/>
+        <circle id="fast-ring" cx="110" cy="110" r="96" fill="none" stroke="#a78bfa" stroke-width="14"
+          stroke-linecap="round" stroke-dasharray="603" stroke-dashoffset="603"
+          style="transition:stroke-dashoffset .5s ease"/>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+        <div id="fast-timer" style="font-family:'Syne',sans-serif;font-size:42px;font-weight:800;letter-spacing:-2px;line-height:1;">0:00:00</div>
+        <div id="fast-status-lbl" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);margin-top:4px;">not fasting</div>
+        <div id="fast-goal-lbl" style="font-family:'DM Mono',monospace;font-size:12px;color:#a78bfa;margin-top:2px;">18:6 goal</div>
+      </div>
+    </div>
+
+    <!-- Start / Stop button -->
+    <button id="fast-btn" onclick="fastToggle()" style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:13px 40px;border-radius:10px;border:none;cursor:pointer;background:#a78bfa;color:#fff;transition:all .18s;">Start Fast</button>
+
+    <!-- Eating window info -->
+    <div id="fast-window-info" style="margin-top:18px;font-family:'DM Mono',monospace;font-size:13px;color:var(--text2);text-align:center;min-height:20px;"></div>
+  </div>
+
+  <!-- Stats row -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:28px;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center;">
+      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);margin-bottom:6px;">Longest Fast</div>
+      <div id="fast-stat-longest" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#a78bfa;">—</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center;">
+      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);margin-bottom:6px;">Avg Fast</div>
+      <div id="fast-stat-avg" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--text);">—</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center;">
+      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);margin-bottom:6px;">Goal Met</div>
+      <div id="fast-stat-met" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--green);">—</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center;">
+      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);margin-bottom:6px;">Total Fasts</div>
+      <div id="fast-stat-total" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--text);">—</div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="sec-hdr"><div class="sec-title">Fast History</div><div class="sec-sub" id="fast-history-sub"></div></div>
+  <div id="fast-history-wrap" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+    <div id="fast-history-body" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);padding:20px;text-align:center;">No completed fasts yet.</div>
+  </div>
+
+</div><!-- /panel-fasting -->
+
 </div><!-- /wrap -->
 
 <script>
@@ -1898,6 +1955,10 @@ function showTab(evt, name) {
   }
   if (name === 'diabetes') {
     requestAnimationFrame(mgInit);
+  }
+  if (name === 'fasting') {
+    requestAnimationFrame(fastInit);
+    return;
   }
 
   const keys = PANELS[name];
@@ -2422,6 +2483,172 @@ function mgInit() {
   const d = document.getElementById('mg-date');
   if (d) d.value = today;
   mgRefresh();
+}
+
+// ─── FASTING TRACKER ──────────────────────────────────────────────────────────
+const FAST_GOAL_HRS = 18;
+const FAST_KEY_ACTIVE = 'fast_active_start'; // localStorage for active fast (survives refreshes)
+let _fastTimer = null;
+window._fastHistory = [];
+
+function fastHrsFmt(ms) {
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function fastUpdateRing(ms) {
+  const pct = Math.min(ms / (FAST_GOAL_HRS * 3600000), 1);
+  const ring = document.getElementById('fast-ring');
+  if (ring) {
+    const circum = 2 * Math.PI * 96; // 603.2
+    ring.style.strokeDashoffset = circum - pct * circum;
+    ring.style.stroke = pct >= 1 ? '#22d47a' : '#a78bfa';
+  }
+}
+
+function fastTick() {
+  const start = localStorage.getItem(FAST_KEY_ACTIVE);
+  if (!start) return;
+  const ms = Date.now() - Number(start);
+  const timerEl = document.getElementById('fast-timer');
+  const lblEl   = document.getElementById('fast-status-lbl');
+  if (timerEl) timerEl.textContent = fastHrsFmt(ms);
+  if (lblEl) {
+    const hrs = ms / 3600000;
+    lblEl.textContent = hrs >= FAST_GOAL_HRS ? '✓ goal reached' : 'fasting…';
+    lblEl.style.color = hrs >= FAST_GOAL_HRS ? 'var(--green)' : 'var(--text3)';
+  }
+  fastUpdateRing(ms);
+
+  // Show eating window countdown
+  const winfoEl = document.getElementById('fast-window-info');
+  if (winfoEl) {
+    const remaining = Math.max(0, FAST_GOAL_HRS * 3600000 - ms);
+    if (remaining > 0) {
+      winfoEl.textContent = fastHrsFmt(remaining) + ' until eating window opens';
+    } else {
+      const windowCloses = FAST_GOAL_HRS * 3600000 + 6 * 3600000;
+      const windowLeft = Math.max(0, windowCloses - ms);
+      winfoEl.textContent = windowLeft > 0
+        ? 'Eating window open · closes in ' + fastHrsFmt(windowLeft)
+        : 'Eating window closed — stop fast';
+    }
+  }
+}
+
+async function fastToggle() {
+  const existing = localStorage.getItem(FAST_KEY_ACTIVE);
+  if (!existing) {
+    // Start fast
+    localStorage.setItem(FAST_KEY_ACTIVE, Date.now());
+    document.getElementById('fast-btn').textContent = 'Stop Fast';
+    document.getElementById('fast-btn').style.background = 'var(--red)';
+    _fastTimer = setInterval(fastTick, 1000);
+    fastTick();
+  } else {
+    // Stop fast — save to Firestore
+    const startMs = Number(existing);
+    const endMs   = Date.now();
+    const durationMs = endMs - startMs;
+    const durationHrs = durationMs / 3600000;
+
+    const record = {
+      startISO: new Date(startMs).toISOString(),
+      endISO:   new Date(endMs).toISOString(),
+      durationMs,
+      durationHrs: Math.round(durationHrs * 10) / 10,
+      goalMet: durationHrs >= FAST_GOAL_HRS
+    };
+
+    try {
+      const { doc, setDoc, collection } = await import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js");
+      await setDoc(doc(window._db, 'fasting_sessions', record.startISO), record);
+    } catch(e) { console.error('Firestore error:', e); }
+
+    localStorage.removeItem(FAST_KEY_ACTIVE);
+    clearInterval(_fastTimer);
+    _fastTimer = null;
+
+    // Reset UI
+    document.getElementById('fast-timer').textContent = '0:00:00';
+    document.getElementById('fast-status-lbl').textContent = 'not fasting';
+    document.getElementById('fast-status-lbl').style.color = 'var(--text3)';
+    document.getElementById('fast-window-info').textContent = '';
+    document.getElementById('fast-btn').textContent = 'Start Fast';
+    document.getElementById('fast-btn').style.background = '#a78bfa';
+    fastUpdateRing(0);
+  }
+}
+
+function fastRenderHistory(sessions) {
+  window._fastHistory = sessions;
+  const wrap = document.getElementById('fast-history-body');
+  const sub  = document.getElementById('fast-history-sub');
+  if (!wrap) return;
+
+  if (!sessions.length) {
+    wrap.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-family:\'DM Mono\',monospace;font-size:13px;">No completed fasts yet.</div>';
+    return;
+  }
+
+  const total   = sessions.length;
+  const longest = Math.max(...sessions.map(s => s.durationHrs));
+  const avg     = sessions.reduce((a,s) => a + s.durationHrs, 0) / total;
+  const met     = sessions.filter(s => s.goalMet).length;
+
+  if (sub) sub.textContent = `${total} session${total===1?'':'s'}`;
+  const setT = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  setT('fast-stat-longest', longest.toFixed(1) + 'h');
+  setT('fast-stat-avg',     avg.toFixed(1) + 'h');
+  setT('fast-stat-met',     met + '/' + total);
+  setT('fast-stat-total',   total);
+
+  wrap.innerHTML = [...sessions].reverse().map(s => {
+    const start = new Date(s.startISO);
+    const end   = new Date(s.endISO);
+    const dateStr = start.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    const timeStr = start.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}) + ' – ' + end.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+    const color = s.goalMet ? 'var(--green)' : s.durationHrs >= 12 ? 'var(--amber)' : 'var(--text3)';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 18px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);">${dateStr}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);margin-top:2px;">${timeStr}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:${color};">${s.durationHrs.toFixed(1)}h</span>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;padding:2px 8px;border-radius:4px;background:${s.goalMet?'rgba(34,212,122,0.1)':'rgba(99,140,210,0.07)'};color:${s.goalMet?'var(--green)':'var(--text3)'};">${s.goalMet?'✓ Goal Met':'Below Goal'}</span>
+        <button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;" onclick="fastDelete('${s.startISO}')" title="Delete">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function fastDelete(startISO) {
+  try {
+    const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js");
+    await deleteDoc(doc(window._db, 'fasting_sessions', startISO));
+  } catch(e) { console.error(e); }
+}
+
+function fastInit() {
+  // Resume timer if a fast was already active (e.g. page refresh)
+  const active = localStorage.getItem(FAST_KEY_ACTIVE);
+  if (active) {
+    document.getElementById('fast-btn').textContent = 'Stop Fast';
+    document.getElementById('fast-btn').style.background = 'var(--red)';
+    _fastTimer = setInterval(fastTick, 1000);
+    fastTick();
+  }
+
+  // Subscribe to Firestore fasting history
+  import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js").then(({ collection, onSnapshot }) => {
+    onSnapshot(collection(window._db, 'fasting_sessions'), snap => {
+      const sessions = snap.docs.map(d => d.data()).sort((a,b) => a.startISO.localeCompare(b.startISO));
+      fastRenderHistory(sessions);
+    });
+  });
 }
 
 // ─── ECG CHARTS ───────────────────────────────────────────────────────────────
