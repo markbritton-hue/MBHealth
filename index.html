@@ -81,19 +81,18 @@
 
   /* TABS */
   .tabs {
-    display:flex; gap:4px; margin-bottom:24px;
+    display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-bottom:24px;
     background:var(--bg2); border:1px solid var(--border);
     border-radius:10px; padding:5px;
-    overflow-x:auto; scrollbar-width:none;
   }
-  .tabs::-webkit-scrollbar { display:none; }
   .tab {
-    flex-shrink:0; padding:9px 18px; border-radius:7px; border:none;
+    padding:11px 14px; border-radius:7px; border:1px solid var(--border2);
     background:transparent; color:var(--text3);
     font-family:'Syne',sans-serif; font-size:14px; font-weight:600;
     letter-spacing:.08em; text-transform:uppercase;
-    cursor:pointer; transition:all .18s; white-space:nowrap;
-    display:flex; align-items:center; gap:7px;
+    cursor:pointer; transition:all .18s;
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    width:100%;
   }
   .tab:hover { color:var(--text2); background:var(--surface); }
   .tab.active { background:var(--surface2); color:var(--text); box-shadow:0 1px 8px rgba(0,0,0,.3); }
@@ -504,6 +503,19 @@
   </div>
 </header>
 
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active"  onclick="showTab(event,'overview')"><span class="tab-dot" style="background:#4f8ef7"></span>Overview</button>
+  <button class="tab"         onclick="showTab(event,'cbc')">     <span class="tab-dot" style="background:#22d47a"></span>CBC</button>
+  <button class="tab"         onclick="showTab(event,'metabolic')"><span class="tab-dot" style="background:#f05252"></span>Metabolic</button>
+  <button class="tab"         onclick="showTab(event,'diabetes')"> <span class="tab-dot" style="background:#f05252"></span>Glucose Tracker</button>
+  <button class="tab"         onclick="showTab(event,'lipids')">   <span class="tab-dot" style="background:#f5a623"></span>Lipids</button>
+  <button class="tab"         onclick="showTab(event,'kidney')">   <span class="tab-dot" style="background:#22d47a"></span>Kidney</button>
+  <button class="tab"         onclick="showTab(event,'thyroid')">  <span class="tab-dot" style="background:#22d47a"></span>Thyroid</button>
+  <button class="tab"         onclick="showTab(event,'ecg')">     <span class="tab-dot" style="background:#ef4444"></span>ECG Monitor</button>
+  <button class="tab"         onclick="showTab(event,'keto')">    <span class="tab-dot" style="background:#c084fc"></span>Keto Analytics</button>
+</div>
+
 <!-- ALERTS -->
 <div class="alerts">
   <div class="alerts-icon">⚠</div>
@@ -520,19 +532,6 @@
       <div class="chip"><span class="dot"></span>Non-HDL 167 mg/dL</div>
     </div>
   </div>
-</div>
-
-<!-- TABS -->
-<div class="tabs">
-  <button class="tab active"  onclick="showTab(event,'overview')"><span class="tab-dot" style="background:#4f8ef7"></span>Overview</button>
-  <button class="tab"         onclick="showTab(event,'cbc')">     <span class="tab-dot" style="background:#22d47a"></span>CBC</button>
-  <button class="tab"         onclick="showTab(event,'metabolic')"><span class="tab-dot" style="background:#f05252"></span>Metabolic</button>
-  <button class="tab"         onclick="showTab(event,'diabetes')"> <span class="tab-dot" style="background:#f05252"></span>Glucose Tracker</button>
-  <button class="tab"         onclick="showTab(event,'lipids')">   <span class="tab-dot" style="background:#f5a623"></span>Lipids</button>
-  <button class="tab"         onclick="showTab(event,'kidney')">   <span class="tab-dot" style="background:#22d47a"></span>Kidney</button>
-  <button class="tab"         onclick="showTab(event,'thyroid')">  <span class="tab-dot" style="background:#22d47a"></span>Thyroid</button>
-  <button class="tab"         onclick="showTab(event,'ecg')">     <span class="tab-dot" style="background:#ef4444"></span>ECG Monitor</button>
-  <button class="tab"         onclick="showTab(event,'keto')">    <span class="tab-dot" style="background:#c084fc"></span>Keto Analytics</button>
 </div>
 
 <!-- ══ OVERVIEW ══ -->
