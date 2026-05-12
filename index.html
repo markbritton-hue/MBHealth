@@ -1686,7 +1686,7 @@ onSnapshot(collection(db, COLL), snap => {
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
         <div id="fast-timer" style="font-family:'Syne',sans-serif;font-size:42px;font-weight:800;letter-spacing:-2px;line-height:1;">0:00:00</div>
         <div id="fast-status-lbl" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);margin-top:4px;">not fasting</div>
-        <div id="fast-goal-lbl" style="font-family:'DM Mono',monospace;font-size:12px;color:#a78bfa;margin-top:2px;">18:6 goal</div>
+        <div id="fast-goal-lbl" style="font-family:'DM Mono',monospace;font-size:12px;color:#a78bfa;margin-top:2px;">18:6 · eat 2 PM – 8 PM</div>
       </div>
     </div>
 
@@ -2522,18 +2522,23 @@ function fastTick() {
   }
   fastUpdateRing(ms);
 
-  // Show eating window countdown
+  // Show eating window info based on 2 PM open / 8 PM close schedule
   const winfoEl = document.getElementById('fast-window-info');
   if (winfoEl) {
-    const remaining = Math.max(0, FAST_GOAL_HRS * 3600000 - ms);
-    if (remaining > 0) {
-      winfoEl.textContent = fastHrsFmt(remaining) + ' until eating window opens';
+    const now = new Date();
+    const h = now.getHours() + now.getMinutes() / 60;
+    if (h >= 14 && h < 20) {
+      // Inside eating window
+      const closeMs = (20 - h) * 3600000;
+      winfoEl.innerHTML = '<span style="color:var(--green)">Eating window open</span> · closes at 8 PM · ' + fastHrsFmt(closeMs) + ' left';
+    } else if (h < 14) {
+      // Morning — window opens at 2 PM
+      const openMs = (14 - h) * 3600000;
+      winfoEl.textContent = 'Window opens at 2 PM · ' + fastHrsFmt(openMs) + ' to go';
     } else {
-      const windowCloses = FAST_GOAL_HRS * 3600000 + 6 * 3600000;
-      const windowLeft = Math.max(0, windowCloses - ms);
-      winfoEl.textContent = windowLeft > 0
-        ? 'Eating window open · closes in ' + fastHrsFmt(windowLeft)
-        : 'Eating window closed — stop fast';
+      // After 8 PM — fasting until 2 PM tomorrow
+      const openMs = (38 - h) * 3600000; // hours until 2 PM next day
+      winfoEl.textContent = 'Next window opens at 2 PM · ' + fastHrsFmt(openMs) + ' to go';
     }
   }
 }
