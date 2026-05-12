@@ -6,6 +6,36 @@
 <meta name="robots" content="noindex, nofollow">
 <title>MBHealth — Personal Health Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+import { getFirestore, collection, doc, setDoc, deleteDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBgLXp-CM4izkHBXwLrcU3bSRHKZydIg0I",
+  authDomain: "healthtracker-88e01.firebaseapp.com",
+  projectId: "healthtracker-88e01",
+  storageBucket: "healthtracker-88e01.firebasestorage.app",
+  messagingSenderId: "931685187622",
+  appId: "1:931685187622:web:7adf302cefbd7c40c966e7"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const COLL = 'glucose_readings';
+
+// Expose Firestore helpers to global scope for the tracker functions
+window._db   = db;
+window._coll = COLL;
+
+// Live listener — refreshes UI whenever Firestore data changes (real-time sync)
+onSnapshot(collection(db, COLL), snap => {
+  const entries = snap.docs
+    .map(d => d.data())
+    .sort((a,b) => a.date.localeCompare(b.date));
+  window._mgEntries = entries;
+  if (window.mgRefresh) mgRefresh();
+});
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -2053,16 +2083,8 @@ function buildKetoTab() {
 }
 
 // ─── DAILY GLUCOSE TRACKER ────────────────────────────────────────────────────
-const MG_KEY = 'healthtracker_glucose_v1';
 let mgChart1 = null, mgChart2 = null;
-
-function mgLoad() {
-  try { return JSON.parse(localStorage.getItem(MG_KEY)) || []; }
-  catch(e) { return []; }
-}
-function mgSave(entries) {
-  localStorage.setItem(MG_KEY, JSON.stringify(entries));
-}
+window._mgEntries = []; // populated by Firestore onSnapshot listener
 
 function mgColorClass(v) {
   if (!v && v !== 0) return 'mg-val-em';
@@ -2076,7 +2098,7 @@ function mgFmt(v) {
   return `<span class="${cls}">${v}</span>`;
 }
 
-function mgAdd() {
+async function mgAdd() {
   const date = document.getElementById('mg-date').value;
   if (!date) { mgFeedback('Please select a date.', true); return; }
 
@@ -2092,23 +2114,22 @@ function mgAdd() {
   if (!hasAny) { mgFeedback('Enter at least one reading.', true); return; }
 
   const note = document.getElementById('mg-note').value.trim();
-  const entries = mgLoad();
 
-  // Merge into existing entry for same date — only overwrite slots that were filled in
-  const idx = entries.findIndex(e => e.date === date);
+  // Merge with existing entry for this date — only overwrite filled slots
+  const existing = (window._mgEntries || []).find(e => e.date === date) || {};
   const filledVals = Object.fromEntries(Object.entries(vals).filter(([,v]) => v !== null));
-  const entry = idx >= 0
-    ? { ...entries[idx], ...filledVals, note: note || entries[idx].note }
-    : { date, note, ...vals };
-  if (idx >= 0) entries[idx] = entry; else entries.push(entry);
-  entries.sort((a,b) => a.date.localeCompare(b.date));
-  mgSave(entries);
+  const entry = { ...existing, ...filledVals, date, note: note || existing.note || '' };
 
-  // Clear slots
-  slots.forEach(s => { const el = document.getElementById('mg-' + s); if (el) el.value = ''; });
-  document.getElementById('mg-note').value = '';
-  mgFeedback('Saved ✓');
-  mgRefresh();
+  try {
+    mgFeedback('Saving…');
+    const { doc, setDoc, collection } = await import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js");
+    await setDoc(doc(window._db, window._coll, date), entry);
+    slots.forEach(s => { const el = document.getElementById('mg-' + s); if (el) el.value = ''; });
+    document.getElementById('mg-note').value = '';
+    mgFeedback('Saved ✓');
+  } catch(e) {
+    mgFeedback('Error saving: ' + e.message, true);
+  }
 }
 
 function mgFeedback(msg, err) {
@@ -2118,14 +2139,17 @@ function mgFeedback(msg, err) {
   setTimeout(() => { el.textContent = ''; }, 3000);
 }
 
-function mgDelete(date) {
-  const entries = mgLoad().filter(e => e.date !== date);
-  mgSave(entries);
-  mgRefresh();
+async function mgDelete(date) {
+  try {
+    const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js");
+    await deleteDoc(doc(window._db, window._coll, date));
+  } catch(e) {
+    mgFeedback('Error deleting: ' + e.message, true);
+  }
 }
 
 function mgRefresh() {
-  const entries = mgLoad();
+  const entries = window._mgEntries || [];
   const hasData = entries.length > 0;
 
   document.getElementById('mg-chart-wrap').style.display  = hasData ? 'block' : 'none';
