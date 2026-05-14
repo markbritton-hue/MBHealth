@@ -109,6 +109,19 @@ onSnapshot(collection(db, COLL), snap => {
   }
   .chip .dot { width:5px; height:5px; border-radius:50%; background:var(--red); flex-shrink:0; }
 
+  /* HOME NAV BUTTONS */
+  .home-nav-btn {
+    display:flex; align-items:center; gap:12px;
+    background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--blue); border-radius:12px;
+    padding:14px 16px; cursor:pointer; text-align:left;
+    transition:background .15s, border-color .15s; width:100%;
+  }
+  .home-nav-btn:hover { background:var(--surface2); border-color:var(--border2); }
+  .home-nav-icon { font-size:22px; flex-shrink:0; line-height:1; }
+  .home-nav-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--text); margin-bottom:2px; }
+  .home-nav-sub   { font-family:'DM Mono',monospace; font-size:11px; color:var(--text3); }
+
   /* TABS */
   .tabs {
     display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-bottom:24px;
@@ -538,7 +551,7 @@ onSnapshot(collection(db, COLL), snap => {
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab active"  onclick="showTab(event,'overview')"><span class="tab-dot" style="background:#4f8ef7"></span>Overview</button>
+  <button class="tab active"  onclick="showTab(event,'overview')"><span class="tab-dot" style="background:#4f8ef7"></span>Home</button>
   <button class="tab"         onclick="showTab(event,'cbc')">     <span class="tab-dot" style="background:#22d47a"></span>CBC</button>
   <button class="tab"         onclick="showTab(event,'metabolic')"><span class="tab-dot" style="background:#f05252"></span>Metabolic</button>
   <button class="tab"         onclick="showTab(event,'diabetes')"> <span class="tab-dot" style="background:#f05252"></span>Glucose Tracker</button>
@@ -572,6 +585,53 @@ onSnapshot(collection(db, COLL), snap => {
 
 <!-- ══ OVERVIEW ══ -->
 <div class="panel active" id="panel-overview">
+
+  <!-- NAV GRID -->
+  <div style="margin-bottom:36px;">
+
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">Daily Tracking</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:24px;">
+      <button onclick="showTab(event,'diabetes')"  class="home-nav-btn" style="border-left-color:#f05252;"><span class="home-nav-icon">🩸</span><div><div class="home-nav-title">Glucose Tracker</div><div class="home-nav-sub">Log & track daily readings</div></div></button>
+      <button onclick="showTab(event,'fasting')"   class="home-nav-btn" style="border-left-color:#a78bfa;"><span class="home-nav-icon">⏳</span><div><div class="home-nav-title">Fasting</div><div class="home-nav-sub">18:6 schedule & analytics</div></div></button>
+      <button onclick="showTab(event,'keto')"      class="home-nav-btn" style="border-left-color:#c084fc;"><span class="home-nav-icon">🥩</span><div><div class="home-nav-title">Keto Analytics</div><div class="home-nav-sub">Ketogenic metrics & trends</div></div></button>
+      <button onclick="showTab(event,'notifications')" class="home-nav-btn" style="border-left-color:#f97316;"><span class="home-nav-icon">🔔</span><div><div class="home-nav-title">Notifications</div><div class="home-nav-sub">ntfy reminders & schedule</div></div></button>
+    </div>
+
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">Lab Results</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:24px;">
+      <button onclick="showTab(event,'cbc')"       class="home-nav-btn" style="border-left-color:#22d47a;"><span class="home-nav-icon">🔬</span><div><div class="home-nav-title">CBC</div><div class="home-nav-sub">Complete blood count</div></div></button>
+      <button onclick="showTab(event,'metabolic')" class="home-nav-btn" style="border-left-color:#f05252;"><span class="home-nav-icon">⚗️</span><div><div class="home-nav-title">Metabolic</div><div class="home-nav-sub">Comprehensive metabolic panel</div></div></button>
+      <button onclick="showTab(event,'lipids')"    class="home-nav-btn" style="border-left-color:#f5a623;"><span class="home-nav-icon">❤️</span><div><div class="home-nav-title">Lipids</div><div class="home-nav-sub">Cholesterol, triglycerides, ApoB</div></div></button>
+      <button onclick="showTab(event,'kidney')"    class="home-nav-btn" style="border-left-color:#22d47a;"><span class="home-nav-icon">🫘</span><div><div class="home-nav-title">Kidney</div><div class="home-nav-sub">eGFR, creatinine, BUN</div></div></button>
+      <button onclick="showTab(event,'thyroid')"   class="home-nav-btn" style="border-left-color:#22d47a;"><span class="home-nav-icon">🦋</span><div><div class="home-nav-title">Thyroid</div><div class="home-nav-sub">TSH history</div></div></button>
+      <button onclick="showTab(event,'ecg')"       class="home-nav-btn" style="border-left-color:#ef4444;"><span class="home-nav-icon">💓</span><div><div class="home-nav-title">ECG Monitor</div><div class="home-nav-sub">Atrial flutter monitoring</div></div></button>
+    </div>
+
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;">Records</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
+      <button onclick="showTab(event,'visit')"     class="home-nav-btn" style="border-left-color:#38bdf8;"><span class="home-nav-icon">📋</span><div><div class="home-nav-title">May 11 Visit</div><div class="home-nav-sub">Recent doctor visit notes</div></div></button>
+    </div>
+  </div>
+
+  <!-- CURRENT VALUES -->
+  <div class="sec-hdr"><div class="sec-title">Current Values</div><div class="sec-sub">Most recent result for each marker</div></div>
+  <div class="overview-grid" style="margin-bottom:36px;">
+    <div class="hcard sh" style="cursor:pointer" onclick="showTab(null,'diabetes')"><div class="hcard-lbl">Glucose</div><div class="hcard-val" style="color:var(--red)">144</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge h">High</span><div class="hcard-range">Normal: 70–99</div></div></div>
+    <div class="hcard sh" style="cursor:pointer" onclick="showTab(null,'diabetes')"><div class="hcard-lbl">HbA1c</div><div class="hcard-val" style="color:var(--red)">6.1</div><div class="hcard-unit">% · Apr 2026</div><div class="hcard-foot"><span class="badge h">High</span><div class="hcard-range">Normal: 4.4–5.6%</div></div></div>
+    <div class="hcard sh" style="cursor:pointer" onclick="showTab(null,'lipids')"><div class="hcard-lbl">LDL</div><div class="hcard-val" style="color:var(--red)">149</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge h">High</span><div class="hcard-range">Normal: &lt;100</div></div></div>
+    <div class="hcard sh" style="cursor:pointer" onclick="showTab(null,'lipids')"><div class="hcard-lbl">Total Cholesterol</div><div class="hcard-val" style="color:var(--red)">219</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge h">High</span><div class="hcard-range">Normal: &lt;200</div></div></div>
+    <div class="hcard sw" style="cursor:pointer" onclick="showTab(null,'lipids')"><div class="hcard-lbl">ApoB</div><div class="hcard-val" style="color:var(--amber)">108</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge w">High</span><div class="hcard-range">Optimal: &lt;90</div></div></div>
+    <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'lipids')"><div class="hcard-lbl">HDL</div><div class="hcard-val" style="color:var(--green)">51</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal ↑</span><div class="hcard-range">Normal: &gt;39</div></div></div>
+    <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'lipids')"><div class="hcard-lbl">Triglycerides</div><div class="hcard-val" style="color:var(--green)">97</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal ↓↓</span><div class="hcard-range">Normal: &lt;150</div></div></div>
+    <div class="hcard sw" style="cursor:pointer" onclick="showTab(null,'keto')"><div class="hcard-lbl">Trig / HDL Ratio</div><div class="hcard-val" style="color:var(--amber)">1.90</div><div class="hcard-unit">97 ÷ 51 · Apr 2026</div><div class="hcard-foot"><span class="badge w">Above Optimal</span><div class="hcard-range">Optimal: &lt;1.5</div></div></div>
+    <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'cbc')"><div class="hcard-lbl">WBC</div><div class="hcard-val" style="color:var(--green)">6.7</div><div class="hcard-unit">X10⁹/L · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: 4.0–11.0</div></div></div>
+    <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'kidney')"><div class="hcard-lbl">eGFR</div><div class="hcard-val" style="color:var(--green)">85</div><div class="hcard-unit">mL/min · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: &gt;60</div></div></div>
+    <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'thyroid')"><div class="hcard-lbl">TSH</div><div class="hcard-val" style="color:var(--green)">1.36</div><div class="hcard-unit">u[iU]/mL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: 0.27–4.20</div></div></div>
+    <div class="hcard sw" style="cursor:pointer" onclick="showTab(null,'kidney')"><div class="hcard-lbl">BUN</div><div class="hcard-val" style="color:var(--amber)">26</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge w">High</span><div class="hcard-range">Normal: 6–20</div></div></div>
+    <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'kidney')"><div class="hcard-lbl">Creatinine</div><div class="hcard-val" style="color:var(--green)">1.04</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: 0.70–1.30</div></div></div>
+  </div>
+
+  <!-- MEDICATIONS -->
   <div class="sec-hdr"><div class="sec-title">Current Medications</div><div class="sec-sub">As of May 11, 2026</div></div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px;margin-bottom:32px;">
 
@@ -655,56 +715,6 @@ onSnapshot(collection(db, COLL), snap => {
 
   </div>
 
-  <div class="sec-hdr"><div class="sec-title">Key Concerns</div><div class="sec-sub">Markers requiring attention</div></div>
-  <div class="concerns">
-    <div class="ccard">
-      <div class="ccard-title">🩸 Elevated Blood Glucose</div>
-      <div class="ccard-desc">Fasting glucose consistently 119–165 mg/dL since 2021 — well above the 70–99 mg/dL normal range. Combined with HbA1c of 6.1%, consistent with prediabetes / insulin resistance. Most recent reading trending down — trajectory is improving.</div>
-      <div class="ccard-val">Latest: 144 mg/dL · Normal: 70–99</div>
-    </div>
-    <div class="ccard">
-      <div class="ccard-title">📊 HbA1c Persistently Elevated</div>
-      <div class="ccard-desc">All HbA1c readings since Feb 2022 exceed the 5.6% ceiling, ranging 6.0–6.8%. Most recent value of 6.1% reflects an estimated average glucose of ~128 mg/dL over 3 months.</div>
-      <div class="ccard-val">Latest: 6.1% · Normal: 4.4–5.6%</div>
-    </div>
-    <div class="ccard">
-      <div class="ccard-title">❤️ High LDL Cholesterol</div>
-      <div class="ccard-desc">LDL has ranged 112–165 mg/dL, consistently above the 100 mg/dL target. Total cholesterol also elevated. Triglycerides improved dramatically from 277 to 97 mg/dL — a major positive trend.</div>
-      <div class="ccard-val">Latest LDL: 149 mg/dL · Normal: &lt;100</div>
-    </div>
-    <div class="ccard a">
-      <div class="ccard-title">🔬 ApoB Elevated</div>
-      <div class="ccard-desc">Apolipoprotein B of 108 mg/dL is above the optimal &lt;90 threshold. ApoB measures total atherogenic particle count and may be a stronger cardiovascular risk predictor than LDL alone.</div>
-      <div class="ccard-val">Latest: 108 mg/dL · Optimal: &lt;90</div>
-    </div>
-    <div class="ccard a">
-      <div class="ccard-title">🧪 BUN/Creatinine Ratio High</div>
-      <div class="ccard-desc">Ratio trending upward, now 26 (normal 6–20). BUN also elevated at 26 mg/dL. Creatinine and eGFR remain normal, suggesting dehydration or elevated protein intake rather than kidney disease.</div>
-      <div class="ccard-val">Latest ratio: 26 · Normal: 6–20</div>
-    </div>
-    <div class="ccard a">
-      <div class="ccard-title">✅ Positive Trends</div>
-      <div class="ccard-desc">Triglycerides: 277→97 mg/dL. HDL rising: 41→51 mg/dL. WBC normalized from 15.5 (2014) to 6.7. TSH normal at 1.36. eGFR stable ~85. Albumin/Creatinine ratio well within normal range.</div>
-      <div class="ccard-val">Multiple markers improving over time</div>
-    </div>
-  </div>
-
-  <div class="sec-hdr"><div class="sec-title">Current Values</div><div class="sec-sub">Most recent result for each marker</div></div>
-  <div class="overview-grid">
-    <div class="hcard sh" style="cursor:pointer" onclick="showTab(null,'diabetes')"><div class="hcard-lbl">Glucose</div><div class="hcard-val" style="color:var(--red)">144</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge h">High</span><div class="hcard-range">Normal: 70–99</div></div></div>
-    <div class="hcard sh" style="cursor:pointer" onclick="showTab(null,'diabetes')"><div class="hcard-lbl">HbA1c</div><div class="hcard-val" style="color:var(--red)">6.1</div><div class="hcard-unit">% · Apr 2026</div><div class="hcard-foot"><span class="badge h">High</span><div class="hcard-range">Normal: 4.4–5.6%</div></div></div>
-    <div class="hcard sh" style="cursor:pointer" onclick="showTab(null,'lipids')"><div class="hcard-lbl">LDL</div><div class="hcard-val" style="color:var(--red)">149</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge h">High</span><div class="hcard-range">Normal: &lt;100</div></div></div>
-    <div class="hcard sh" style="cursor:pointer" onclick="showTab(null,'lipids')"><div class="hcard-lbl">Total Cholesterol</div><div class="hcard-val" style="color:var(--red)">219</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge h">High</span><div class="hcard-range">Normal: &lt;200</div></div></div>
-    <div class="hcard sw" style="cursor:pointer" onclick="showTab(null,'lipids')"><div class="hcard-lbl">ApoB</div><div class="hcard-val" style="color:var(--amber)">108</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge w">High</span><div class="hcard-range">Optimal: &lt;90</div></div></div>
-    <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'lipids')"><div class="hcard-lbl">HDL</div><div class="hcard-val" style="color:var(--green)">51</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal ↑</span><div class="hcard-range">Normal: &gt;39</div></div></div>
-    <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'lipids')"><div class="hcard-lbl">Triglycerides</div><div class="hcard-val" style="color:var(--green)">97</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal ↓↓</span><div class="hcard-range">Normal: &lt;150</div></div></div>
-    <div class="hcard sw" style="cursor:pointer" onclick="showTab(null,'keto')"><div class="hcard-lbl">Trig / HDL Ratio</div><div class="hcard-val" style="color:var(--amber)">1.90</div><div class="hcard-unit">97 ÷ 51 · Apr 2026</div><div class="hcard-foot"><span class="badge w">Above Optimal</span><div class="hcard-range">Optimal: &lt;1.5</div></div></div>
-    <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'cbc')"><div class="hcard-lbl">WBC</div><div class="hcard-val" style="color:var(--green)">6.7</div><div class="hcard-unit">X10⁹/L · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: 4.0–11.0</div></div></div>
-    <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'kidney')"><div class="hcard-lbl">eGFR</div><div class="hcard-val" style="color:var(--green)">85</div><div class="hcard-unit">mL/min · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: &gt;60</div></div></div>
-    <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'thyroid')"><div class="hcard-lbl">TSH</div><div class="hcard-val" style="color:var(--green)">1.36</div><div class="hcard-unit">u[iU]/mL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: 0.27–4.20</div></div></div>
-    <div class="hcard sw" style="cursor:pointer" onclick="showTab(null,'kidney')"><div class="hcard-lbl">BUN</div><div class="hcard-val" style="color:var(--amber)">26</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge w">High</span><div class="hcard-range">Normal: 6–20</div></div></div>
-    <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'kidney')"><div class="hcard-lbl">Creatinine</div><div class="hcard-val" style="color:var(--green)">1.04</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: 0.70–1.30</div></div></div>
-  </div>
 
 </div>
 
