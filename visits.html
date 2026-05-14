@@ -142,11 +142,19 @@ window._db = getFirestore(app);
       <textarea id="vm-pdf-text" class="vm-input" rows="8" style="resize:vertical;margin-top:10px;display:none;" placeholder="Extracted text will appear here — you can edit before saving"></textarea>
     </div>
 
+    <!-- PHI Review step (hidden until redaction runs) -->
+    <div id="vm-review-pane" style="display:none;margin-top:16px;">
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--amber);margin-bottom:8px;">&#9888; PHI redacted — review before saving. Edit if anything was missed or incorrectly removed.</div>
+      <div id="vm-redact-summary" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:8px;"></div>
+      <textarea id="vm-review-text" class="vm-input" rows="10" style="resize:vertical;"></textarea>
+    </div>
+
     <div id="vm-error" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--red);margin-top:12px;min-height:16px;"></div>
 
     <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;">
       <button onclick="visitModalClose()" style="font-family:'DM Mono',monospace;font-size:13px;padding:9px 20px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text3);cursor:pointer;">Cancel</button>
-      <button onclick="visitSave()" id="vm-save-btn" style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:9px 24px;border-radius:8px;border:none;background:#a78bfa;color:#fff;cursor:pointer;">Save Visit</button>
+      <button onclick="visitReview()" id="vm-review-btn" style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:9px 24px;border-radius:8px;border:none;background:#a78bfa;color:#fff;cursor:pointer;">Review &amp; Redact PHI</button>
+      <button onclick="visitSave()" id="vm-save-btn" style="display:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:9px 24px;border-radius:8px;border:none;background:#22d47a;color:#111;cursor:pointer;">Confirm &amp; Save</button>
     </div>
   </div>
 </div>
@@ -159,6 +167,44 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 
 let _vmTab = 'paste';
 
+// --- PHI redaction ---
+const PHI_RULES = [
+  // SSN
+  { label: 'SSN',           re: /\b\d{3}-\d{2}-\d{4}\b/g },
+  // Phone numbers (US)
+  { label: 'Phone',         re: /(\+1[\s.-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}\b/g },
+  // Email
+  { label: 'Email',         re: /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g },
+  // MRN / medical record number
+  { label: 'MRN',           re: /\b(MRN|Medical Record(?: Number)?|Patient ID)[:\s#]+[\w\d-]+/gi },
+  // Date of birth
+  { label: 'DOB',           re: /\b(DOB|Date of Birth|Birth(?:day|date))[:\s]+\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/gi },
+  // Street address (number + street name keyword)
+  { label: 'Address',       re: /\b\d{1,5}\s+\w[\w\s]{2,30}(?:St(?:reet)?|Ave(?:nue)?|Blvd|Rd|Dr(?:ive)?|Ln|Ct|Way|Pl(?:ace)?|Circle|Cir)\b\.?/gi },
+  // ZIP code (standalone 5-digit or ZIP+4)
+  { label: 'ZIP',           re: /\b\d{5}(?:-\d{4})?\b/g },
+  // NPI / DEA numbers
+  { label: 'NPI',           re: /\bNPI[:\s#]+\d{10}\b/gi },
+  { label: 'DEA',           re: /\bDEA[:\s#]+[A-Z]{2}\d{7}\b/gi },
+  // Insurance member / group IDs (common prefixes)
+  { label: 'Insurance ID',  re: /\b(Member|Group|Policy|Subscriber)\s*(ID|#|No\.?)[:\s]+[\w\d-]{5,}/gi },
+  // Fax numbers (same pattern as phone but labeled differently — caught by Phone rule)
+];
+
+function redactPHI(text) {
+  let redacted = text;
+  const counts = {};
+  for (const rule of PHI_RULES) {
+    const matches = redacted.match(rule.re);
+    if (matches) {
+      counts[rule.label] = (counts[rule.label] || 0) + matches.length;
+      redacted = redacted.replace(rule.re, `[${rule.label} REDACTED]`);
+    }
+  }
+  return { redacted, counts };
+}
+
+// --- Modal open/close ---
 function visitModalOpen() {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('vm-date').value = today;
@@ -170,6 +216,9 @@ function visitModalOpen() {
   document.getElementById('vm-pdf-status').textContent = '';
   document.getElementById('vm-error').textContent = '';
   document.getElementById('vm-file').value = '';
+  document.getElementById('vm-review-pane').style.display = 'none';
+  document.getElementById('vm-review-btn').style.display = '';
+  document.getElementById('vm-save-btn').style.display = 'none';
   visitTabSwitch('paste', document.querySelector('.vm-tab'));
   document.getElementById('visit-modal-backdrop').classList.add('open');
 }
@@ -185,8 +234,13 @@ function visitTabSwitch(tab, btn) {
   btn.classList.add('active');
   document.getElementById('vm-pane-paste').style.display = tab === 'paste' ? '' : 'none';
   document.getElementById('vm-pane-pdf').style.display  = tab === 'pdf'   ? '' : 'none';
+  // Reset review pane when switching tabs
+  document.getElementById('vm-review-pane').style.display = 'none';
+  document.getElementById('vm-review-btn').style.display = '';
+  document.getElementById('vm-save-btn').style.display = 'none';
 }
 
+// --- PDF handling ---
 function visitDragOver(e) {
   e.preventDefault();
   document.getElementById('vm-drop').classList.add('drag-over');
@@ -208,6 +262,10 @@ async function visitFileSelected(file) {
   }
   const statusEl = document.getElementById('vm-pdf-status');
   statusEl.textContent = 'Extracting text…';
+  // Reset review pane on new file
+  document.getElementById('vm-review-pane').style.display = 'none';
+  document.getElementById('vm-review-btn').style.display = '';
+  document.getElementById('vm-save-btn').style.display = 'none';
   try {
     const buf = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
@@ -231,23 +289,50 @@ async function visitFileSelected(file) {
   }
 }
 
+// --- Step 1: redact and show review pane ---
+function visitReview() {
+  const errEl = document.getElementById('vm-error');
+  errEl.textContent = '';
+
+  const date  = document.getElementById('vm-date').value;
+  const title = document.getElementById('vm-title').value.trim();
+  if (!date)  { errEl.textContent = 'Date is required.'; return; }
+  if (!title) { errEl.textContent = 'Title / description is required.'; return; }
+
+  const raw = _vmTab === 'paste'
+    ? document.getElementById('vm-text').value.trim()
+    : document.getElementById('vm-pdf-text').value.trim();
+
+  if (!raw) { errEl.textContent = 'No content — paste text or upload a PDF.'; return; }
+
+  const { redacted, counts } = redactPHI(raw);
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const summaryEl = document.getElementById('vm-redact-summary');
+  if (total === 0) {
+    summaryEl.textContent = 'No PHI patterns detected. Review the text below before saving.';
+  } else {
+    summaryEl.textContent = `Redacted ${total} item${total===1?'':'s'}: ` +
+      Object.entries(counts).map(([k,v]) => `${v} ${k}`).join(', ') + '.';
+  }
+
+  document.getElementById('vm-review-text').value = redacted;
+  document.getElementById('vm-review-pane').style.display = '';
+  document.getElementById('vm-review-btn').style.display = 'none';
+  document.getElementById('vm-save-btn').style.display = '';
+  document.getElementById('vm-review-pane').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// --- Step 2: save reviewed/edited content ---
 async function visitSave() {
   const errEl = document.getElementById('vm-error');
   errEl.textContent = '';
 
   const date  = document.getElementById('vm-date').value;
-  const type  = document.getElementById('vm-title').value.trim() || document.getElementById('vm-type').value.trim();
   const vtype = document.getElementById('vm-type').value.trim();
   const title = document.getElementById('vm-title').value.trim();
+  const content = document.getElementById('vm-review-text').value.trim();
 
-  if (!date)  { errEl.textContent = 'Date is required.'; return; }
-  if (!title) { errEl.textContent = 'Title / description is required.'; return; }
-
-  const content = _vmTab === 'paste'
-    ? document.getElementById('vm-text').value.trim()
-    : document.getElementById('vm-pdf-text').value.trim();
-
-  if (!content) { errEl.textContent = 'No content — paste text or upload a PDF.'; return; }
+  if (!content) { errEl.textContent = 'No content to save.'; return; }
 
   const btn = document.getElementById('vm-save-btn');
   btn.textContent = 'Saving…';
@@ -268,7 +353,7 @@ async function visitSave() {
   } catch(err) {
     errEl.textContent = 'Save failed: ' + err.message;
   } finally {
-    btn.textContent = 'Save Visit';
+    btn.textContent = 'Confirm & Save';
     btn.disabled = false;
   }
 }
