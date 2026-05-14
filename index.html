@@ -2075,12 +2075,10 @@ function renderNotifCards() {
 async function notifTest(id) {
   const n = notifConfig.notifications.find(x => x.id === id);
   if (!n) return;
+  const url = `https://ntfy.sh/${NTFY_TOPIC}?title=${encodeURIComponent(n.label)}&message=${encodeURIComponent(n.message)}`;
   try {
-    await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
-      method: 'POST',
-      headers: { 'Title': n.label },
-      body: n.message
-    });
+    const res = await fetch(url, { method: 'POST' });
+    console.log('ntfy test', res.status, n.label);
   } catch(e) {
     console.warn('ntfy test failed', e);
   }
