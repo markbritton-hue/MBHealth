@@ -2065,7 +2065,8 @@ function renderNotifCards() {
           <div style="font-family:\'DM Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">Time (ET)</div>
           <input type="time" value="${n.time}" readonly style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-family:\'DM Mono\',monospace;font-size:13px;color:var(--text);outline:none;cursor:default;">
         </div>
-        <button onclick="notifTest('${n.id}')" style="margin-top:16px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:6px 14px;font-family:\'DM Mono\',monospace;font-size:12px;color:var(--text3);cursor:pointer;">Test ▶</button>
+        <button id="notif-btn-${n.id}" onclick="notifTest('${n.id}')" style="margin-top:16px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:6px 14px;font-family:\'DM Mono\',monospace;font-size:12px;color:var(--text3);cursor:pointer;">Test ▶</button>
+        <span id="notif-sent-${n.id}" style="display:none;margin-top:16px;font-family:\'DM Mono\',monospace;font-size:12px;color:var(--green);">✓ Sent</span>
       </div>`;
     container.appendChild(card);
   });
@@ -2075,12 +2076,20 @@ function renderNotifCards() {
 async function notifTest(id) {
   const n = notifConfig.notifications.find(x => x.id === id);
   if (!n) return;
+  const btn  = document.getElementById(`notif-btn-${id}`);
+  const sent = document.getElementById(`notif-sent-${id}`);
+  btn.disabled = true;
+  btn.textContent = '…';
   const url = `https://ntfy.sh/${NTFY_TOPIC}?title=${encodeURIComponent(n.label)}&message=${encodeURIComponent(n.message)}`;
   try {
-    const res = await fetch(url, { method: 'POST' });
-    console.log('ntfy test', res.status, n.label);
+    await fetch(url, { method: 'POST' });
+    sent.style.display = 'inline';
+    setTimeout(() => { sent.style.display = 'none'; }, 3000);
   } catch(e) {
     console.warn('ntfy test failed', e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Test ▶';
   }
 }
 
