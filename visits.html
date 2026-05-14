@@ -8,6 +8,48 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+const app = initializeApp({
+  apiKey: "AIzaSyBgLXp-CM4izkHBXwLrcU3bSRHKZydIg0I",
+  authDomain: "healthtracker-88e01.firebaseapp.com",
+  projectId: "healthtracker-88e01",
+  storageBucket: "healthtracker-88e01.firebasestorage.app",
+  messagingSenderId: "931685187622",
+  appId: "1:931685187622:web:7adf302cefbd7c40c966e7"
+});
+window._db = getFirestore(app);
+</script>
+<style>
+#visit-modal-backdrop {
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;padding:16px;
+}
+#visit-modal-backdrop.open { display:flex; }
+#visit-modal {
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:28px;
+}
+.vm-label { font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);margin-bottom:6px; }
+.vm-input {
+  width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;padding:10px 12px;font-family:'DM Mono',monospace;font-size:13px;
+  color:var(--text);outline:none;transition:border-color .15s;
+}
+.vm-input:focus { border-color:#a78bfa; }
+.vm-tabs { display:flex;gap:8px;margin-bottom:16px; }
+.vm-tab {
+  flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:none;
+  font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);cursor:pointer;transition:all .15s;
+}
+.vm-tab.active { background:#a78bfa;border-color:#a78bfa;color:#fff; }
+#vm-drop {
+  border:2px dashed var(--border);border-radius:10px;padding:32px;text-align:center;
+  cursor:pointer;transition:border-color .15s;
+}
+#vm-drop.drag-over { border-color:#a78bfa; }
+#vm-drop input[type=file] { display:none; }
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -30,10 +72,17 @@
 
 <a href="index.html" class="back-btn">← Home</a>
 
-<div class="sec-hdr"><div class="sec-title">Visit Records</div><div class="sec-sub">Doctor visits &amp; after-visit summaries</div></div>
+<div class="sec-hdr" style="margin-bottom:16px;">
+  <div>
+    <div class="sec-title">Visit Records</div>
+    <div class="sec-sub" id="visits-sub">Doctor visits &amp; after-visit summaries</div>
+  </div>
+  <button onclick="visitModalOpen()" style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:8px 18px;border-radius:8px;border:none;background:#a78bfa;color:#fff;cursor:pointer;">+ Add Visit</button>
+</div>
 
-<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px;">
+<div id="visits-list" style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px;">
 
+  <!-- Hardcoded May 11 visit -->
   <a href="visit.html" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:var(--surface);border:1px solid var(--border);border-left:3px solid #38bdf8;border-radius:12px;gap:16px;flex-wrap:wrap;">
     <div>
       <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;">May 11, 2026</div>
@@ -49,7 +98,239 @@
 
 </div>
 
+<!-- Add Visit Modal -->
+<div id="visit-modal-backdrop" onclick="visitModalClose(event)">
+  <div id="visit-modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">Add Visit</div>
+      <button onclick="visitModalClose()" style="background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer;line-height:1;">✕</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div>
+        <div class="vm-label">Date</div>
+        <input id="vm-date" type="date" class="vm-input">
+      </div>
+      <div>
+        <div class="vm-label">Visit Type</div>
+        <input id="vm-type" type="text" class="vm-input" placeholder="e.g. Primary Care">
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div class="vm-label">Title / Description</div>
+      <input id="vm-title" type="text" class="vm-input" placeholder="e.g. After-Visit Summary">
+    </div>
+
+    <div class="vm-tabs">
+      <button class="vm-tab active" onclick="visitTabSwitch('paste',this)">Paste Text</button>
+      <button class="vm-tab" onclick="visitTabSwitch('pdf',this)">Upload PDF</button>
+    </div>
+
+    <div id="vm-pane-paste">
+      <div class="vm-label">Visit notes / summary text</div>
+      <textarea id="vm-text" class="vm-input" rows="10" style="resize:vertical;" placeholder="Paste the after-visit summary or any notes here…"></textarea>
+    </div>
+
+    <div id="vm-pane-pdf" style="display:none;">
+      <div id="vm-drop" onclick="document.getElementById('vm-file').click()" ondragover="visitDragOver(event)" ondragleave="visitDragLeave(event)" ondrop="visitDrop(event)">
+        <input type="file" id="vm-file" accept=".pdf" onchange="visitFileSelected(this.files[0])">
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Drop PDF here or click to browse</div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">Text will be extracted automatically</div>
+      </div>
+      <div id="vm-pdf-status" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);margin-top:10px;min-height:18px;"></div>
+      <textarea id="vm-pdf-text" class="vm-input" rows="8" style="resize:vertical;margin-top:10px;display:none;" placeholder="Extracted text will appear here — you can edit before saving"></textarea>
+    </div>
+
+    <div id="vm-error" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--red);margin-top:12px;min-height:16px;"></div>
+
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;">
+      <button onclick="visitModalClose()" style="font-family:'DM Mono',monospace;font-size:13px;padding:9px 20px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text3);cursor:pointer;">Cancel</button>
+      <button onclick="visitSave()" id="vm-save-btn" style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:9px 24px;border-radius:8px;border:none;background:#a78bfa;color:#fff;cursor:pointer;">Save Visit</button>
+    </div>
+  </div>
+</div>
+
 </div>
 <script src="shared-data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let _vmTab = 'paste';
+
+function visitModalOpen() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('vm-date').value = today;
+  document.getElementById('vm-type').value = '';
+  document.getElementById('vm-title').value = '';
+  document.getElementById('vm-text').value = '';
+  document.getElementById('vm-pdf-text').value = '';
+  document.getElementById('vm-pdf-text').style.display = 'none';
+  document.getElementById('vm-pdf-status').textContent = '';
+  document.getElementById('vm-error').textContent = '';
+  document.getElementById('vm-file').value = '';
+  visitTabSwitch('paste', document.querySelector('.vm-tab'));
+  document.getElementById('visit-modal-backdrop').classList.add('open');
+}
+
+function visitModalClose(e) {
+  if (e && e.target !== document.getElementById('visit-modal-backdrop') && e.type === 'click') return;
+  document.getElementById('visit-modal-backdrop').classList.remove('open');
+}
+
+function visitTabSwitch(tab, btn) {
+  _vmTab = tab;
+  document.querySelectorAll('.vm-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('vm-pane-paste').style.display = tab === 'paste' ? '' : 'none';
+  document.getElementById('vm-pane-pdf').style.display  = tab === 'pdf'   ? '' : 'none';
+}
+
+function visitDragOver(e) {
+  e.preventDefault();
+  document.getElementById('vm-drop').classList.add('drag-over');
+}
+function visitDragLeave() {
+  document.getElementById('vm-drop').classList.remove('drag-over');
+}
+function visitDrop(e) {
+  e.preventDefault();
+  document.getElementById('vm-drop').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) visitFileSelected(file);
+}
+
+async function visitFileSelected(file) {
+  if (!file || file.type !== 'application/pdf') {
+    document.getElementById('vm-pdf-status').textContent = 'Please select a PDF file.';
+    return;
+  }
+  const statusEl = document.getElementById('vm-pdf-status');
+  statusEl.textContent = 'Extracting text…';
+  try {
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let text = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(item => item.str).join(' ') + '\n\n';
+    }
+    text = text.trim();
+    if (!text) { statusEl.textContent = 'No text found in PDF (scanned image?).'; return; }
+    statusEl.textContent = `Extracted ${pdf.numPages} page${pdf.numPages===1?'':'s'} · ${text.length.toLocaleString()} characters`;
+    const ta = document.getElementById('vm-pdf-text');
+    ta.value = text;
+    ta.style.display = '';
+    if (!document.getElementById('vm-title').value && file.name) {
+      document.getElementById('vm-title').value = file.name.replace(/\.pdf$/i, '');
+    }
+  } catch(err) {
+    statusEl.textContent = 'Error reading PDF: ' + err.message;
+  }
+}
+
+async function visitSave() {
+  const errEl = document.getElementById('vm-error');
+  errEl.textContent = '';
+
+  const date  = document.getElementById('vm-date').value;
+  const type  = document.getElementById('vm-title').value.trim() || document.getElementById('vm-type').value.trim();
+  const vtype = document.getElementById('vm-type').value.trim();
+  const title = document.getElementById('vm-title').value.trim();
+
+  if (!date)  { errEl.textContent = 'Date is required.'; return; }
+  if (!title) { errEl.textContent = 'Title / description is required.'; return; }
+
+  const content = _vmTab === 'paste'
+    ? document.getElementById('vm-text').value.trim()
+    : document.getElementById('vm-pdf-text').value.trim();
+
+  if (!content) { errEl.textContent = 'No content — paste text or upload a PDF.'; return; }
+
+  const btn = document.getElementById('vm-save-btn');
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+
+  const record = {
+    date,
+    visitType: vtype || 'General',
+    title,
+    content,
+    createdISO: new Date().toISOString()
+  };
+
+  try {
+    const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js");
+    await setDoc(doc(window._db, 'visits', date + '_' + Date.now()), record);
+    visitModalClose();
+  } catch(err) {
+    errEl.textContent = 'Save failed: ' + err.message;
+  } finally {
+    btn.textContent = 'Save Visit';
+    btn.disabled = false;
+  }
+}
+
+function visitRenderFirestore(visits) {
+  const list = document.getElementById('visits-list');
+  // Remove previously rendered Firestore cards (keep hardcoded May 11 card)
+  list.querySelectorAll('[data-firestore]').forEach(el => el.remove());
+
+  visits.sort((a,b) => b.date.localeCompare(a.date)).forEach(v => {
+    const dateObj = new Date(v.date + 'T12:00:00');
+    const dateStr = dateObj.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+    const card = document.createElement('div');
+    card.setAttribute('data-firestore', v.id);
+    card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-left:3px solid #a78bfa;border-radius:12px;overflow:hidden;';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;gap:16px;flex-wrap:wrap;cursor:pointer;" onclick="visitToggle(this)">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;">${dateStr}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">${escHtml(v.visitType)} · ${escHtml(v.title)}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-family:'DM Mono',monospace;font-size:11px;padding:3px 9px;border-radius:4px;background:rgba(167,139,250,0.1);color:#a78bfa;">Uploaded</span>
+          <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">▼</span>
+          <button onclick="visitDelete(event,'${v.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:4px;" title="Delete">✕</button>
+        </div>
+      </div>
+      <div class="visit-body" style="display:none;padding:0 20px 18px;">
+        <pre style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);white-space:pre-wrap;word-break:break-word;margin:0;line-height:1.7;max-height:400px;overflow-y:auto;">${escHtml(v.content)}</pre>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function visitToggle(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('span:last-of-type');
+  const open = body.style.display === 'none';
+  body.style.display = open ? '' : 'none';
+  if (arrow) arrow.textContent = open ? '▲' : '▼';
+}
+
+async function visitDelete(e, id) {
+  e.stopPropagation();
+  if (!confirm('Delete this visit record?')) return;
+  try {
+    const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js");
+    await deleteDoc(doc(window._db, 'visits', id));
+  } catch(err) { alert('Delete failed: ' + err.message); }
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Load Firestore visits
+import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js").then(({ collection, onSnapshot }) => {
+  onSnapshot(collection(window._db, 'visits'), snap => {
+    const visits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    visitRenderFirestore(visits);
+  });
+});
+</script>
 </body>
 </html>
