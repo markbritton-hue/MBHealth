@@ -343,7 +343,8 @@ async function visitSave() {
 }
 
 const STATIC_VISITS = [
-  { id: '_may11', date: '2026-05-11', static: true }
+  { id: '_may11', date: '2026-05-11', static: true, template: 'may11' },
+  { id: '_cta',   date: '2026-05-13', static: true, template: 'cta'   }
 ];
 
 function visitRenderFirestore(firestoreVisits) {
@@ -359,7 +360,7 @@ function visitRenderFirestore(firestoreVisits) {
     const dateObj = new Date(v.date + 'T12:00:00');
     const dateStr = dateObj.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
 
-    if (v.static) {
+    if (v.static && v.template === 'may11') {
       const a = document.createElement('a');
       a.href = 'visit.html';
       a.style.cssText = 'text-decoration:none;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:var(--surface);border:1px solid var(--border);border-left:3px solid #38bdf8;border-radius:12px;gap:16px;flex-wrap:wrap;';
@@ -375,6 +376,39 @@ function visitRenderFirestore(firestoreVisits) {
           <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">→</span>
         </div>`;
       list.appendChild(a);
+      return;
+    }
+
+    if (v.static && v.template === 'cta') {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-left:3px solid #f97316;border-radius:12px;overflow:hidden;';
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;gap:16px;flex-wrap:wrap;cursor:pointer;" onclick="visitToggle(this)">
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;">${dateStr}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">Radiology · CT Coronary Angiography</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span style="font-family:'DM Mono',monospace;font-size:11px;padding:3px 9px;border-radius:4px;background:rgba(249,115,22,0.1);color:#f97316;">Imaging</span>
+            <span style="font-family:'DM Mono',monospace;font-size:11px;padding:3px 9px;border-radius:4px;background:rgba(99,140,210,0.07);color:var(--text3);">Report pending</span>
+            <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">▼</span>
+          </div>
+        </div>
+        <div class="visit-body" style="display:none;padding:0 20px 18px;">
+          <div style="font-family:'DM Mono',monospace;font-size:13px;line-height:2;color:var(--text2);">
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 16px;">
+              <span style="color:var(--text3);">Facility</span><span>Bronson Methodist Hospital</span>
+              <span style="color:var(--text3);">Referring</span><span>Dr. Steven M. Konicki</span>
+              <span style="color:var(--text3);">Study</span><span>CT Coronary Angiography (CCTA)</span>
+              <span style="color:var(--text3);">Accession</span><span>REDACTED</span>
+              <span style="color:var(--text3);">Series</span><span>27 series · 3,182 image slices</span>
+              <span style="color:var(--text3);">Coronaries</span><span>RCA, LAD, CX, OM, PDA, Diagonal, AM, PLA imaged</span>
+              <span style="color:var(--text3);">Phases</span><span>40%, 50%, 70%, 80% cardiac cycle reconstructions</span>
+              <span style="color:var(--text3);">Report</span><span style="color:var(--amber);">Awaiting radiologist report — check MyChart</span>
+            </div>
+          </div>
+        </div>`;
+      list.appendChild(card);
       return;
     }
 
