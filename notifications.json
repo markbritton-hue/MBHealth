@@ -10,7 +10,7 @@
     },
     {
       "id": "glucose_premeal",
-      "label": "Glucose Check — Pre-Meal",
+      "label": "Glucose Check - Pre-Meal",
       "message": "Time for your pre-meal glucose check",
       "time": "13:45",
       "enabled": true
@@ -18,7 +18,7 @@
     {
       "id": "eating_open",
       "label": "Eating Window Opens",
-      "message": "Fasting ends — eating window is open (2 PM–8 PM)",
+      "message": "Fasting ends - eating window is open (2 PM–8 PM)",
       "time": "14:00",
       "enabled": true
     },
@@ -39,13 +39,13 @@
     {
       "id": "eating_close",
       "label": "Eating Window Closes",
-      "message": "Eating window closing — fasting begins",
+      "message": "Eating window closing - fasting begins",
       "time": "20:00",
       "enabled": true
     },
     {
       "id": "glucose_postmeal",
-      "label": "Glucose Check — Post-Dinner",
+      "label": "Glucose Check - Post-Dinner",
       "message": "Time for your post-dinner glucose check",
       "time": "21:00",
       "enabled": true

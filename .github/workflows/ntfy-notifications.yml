@@ -53,10 +53,11 @@ jobs:
                       continue
 
               try:
+                  safe_title = n['label'].encode('latin-1', errors='replace').decode('latin-1')
                   req = urllib.request.Request(
                       f'https://ntfy.sh/{topic}',
                       data=n['message'].encode(),
-                      headers={'Title': n['label']},
+                      headers={'Title': safe_title},
                       method='POST'
                   )
                   with urllib.request.urlopen(req, timeout=10) as resp:
