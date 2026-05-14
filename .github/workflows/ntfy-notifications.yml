@@ -1,0 +1,63 @@
+name: Health Notifications
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      test_id:
+        description: 'Notification ID to test (leave empty to run scheduled check)'
+        required: false
+        default: ''
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Send due notifications
+        env:
+          TEST_ID: ${{ github.event.inputs.test_id }}
+        run: |
+          python3 << 'EOF'
+          import json, subprocess, os
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+          with open('notifications.json') as f:
+              config = json.load(f)
+
+          tz = ZoneInfo(config['timezone'])
+          now = datetime.now(tz)
+          cur = now.hour * 60 + now.minute
+          test_id = os.environ.get('TEST_ID', '').strip()
+
+          sent = 0
+          for n in config['notifications']:
+              if test_id:
+                  if n['id'] != test_id:
+                      continue
+              else:
+                  if not n.get('enabled', True):
+                      continue
+                  h, m = map(int, n['time'].split(':'))
+                  due = h * 60 + m
+                  if not (cur >= due and cur < due + 5):
+                      continue
+
+              result = subprocess.run([
+                  'curl', '-s', '-o', '/dev/null', '-w', '%{http_code}',
+                  '-H', f"Title: {n['label']}",
+                  '-d', n['message'],
+                  'https://ntfy.sh/markb-healthtrack'
+              ], capture_output=True, text=True)
+
+              status = result.stdout.strip()
+              icon = '✓' if status == '200' else '✗'
+              print(f"{icon} [{status}] {n['label']} — {n['time']}")
+              sent += 1
+
+          if sent == 0:
+              print(f"No notifications due at {now.strftime('%H:%M')} ET")
+          EOF

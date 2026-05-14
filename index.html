@@ -546,6 +546,7 @@ onSnapshot(collection(db, COLL), snap => {
   <button class="tab"         onclick="showTab(event,'keto')">    <span class="tab-dot" style="background:#c084fc"></span>Keto Analytics</button>
   <button class="tab"         onclick="showTab(event,'visit')">   <span class="tab-dot" style="background:#38bdf8"></span>May 11 Visit</button>
   <button class="tab"         onclick="showTab(event,'fasting')"> <span class="tab-dot" style="background:#a78bfa"></span>Fasting</button>
+  <button class="tab"         onclick="showTab(event,'notifications')"><span class="tab-dot" style="background:#f97316"></span>Notifications</button>
 </div>
 
 <!-- ALERTS -->
@@ -1809,6 +1810,38 @@ onSnapshot(collection(db, COLL), snap => {
 
 </div><!-- /panel-fasting -->
 
+<!-- ══ NOTIFICATIONS ══ -->
+<div class="panel" id="panel-notifications">
+  <div class="sec-hdr"><div class="sec-title">Notifications</div><div class="sec-sub">ntfy · markb-healthtrack · Times in ET</div></div>
+
+  <!-- GitHub PAT setup -->
+  <div id="notif-pat-section" style="background:var(--surface);border:1px solid rgba(249,115,22,0.25);border-left:3px solid #f97316;border-radius:12px;padding:18px 22px;max-width:680px;margin-bottom:24px;">
+    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;color:#f97316;">GitHub Setup</div>
+    <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.7;">
+      A Personal Access Token (PAT) is required to save changes to the repo.<br>
+      Create one at <span style="color:var(--blue);">github.com → Settings → Developer settings → Fine-grained tokens</span><br>
+      Permissions needed: <strong style="color:var(--text2);">Contents: Read &amp; Write</strong> on this repository only.
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+      <div style="flex:1;min-width:240px;">
+        <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">GitHub PAT</div>
+        <input id="notif-pat-input" type="password" placeholder="github_pat_..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);outline:none;" oninput="notifPatChanged()">
+      </div>
+      <button onclick="notifSavePat()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:9px 18px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;white-space:nowrap;">Save PAT</button>
+    </div>
+    <div id="notif-pat-status" style="margin-top:8px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);"></div>
+  </div>
+
+  <!-- Notification cards -->
+  <div id="notif-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:13px;max-width:980px;margin-bottom:24px;"></div>
+
+  <!-- Actions -->
+  <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;max-width:680px;">
+    <button onclick="notifSaveAll()" style="background:#f97316;border:none;border-radius:8px;padding:10px 24px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;">Save to GitHub</button>
+    <div id="notif-save-status" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);"></div>
+  </div>
+</div><!-- /panel-notifications -->
+
 
 </div><!-- /wrap -->
 
@@ -2019,6 +2052,126 @@ const PANELS = {
   lipids:    ['chol','trig','hdl','ldl','nonhdl','cholhdl'],
   kidney:    ['albuminurine','creatinineurine','acr'],
 };
+// ── NOTIFICATIONS ──────────────────────────────────────────────
+const NOTIF_REPO  = 'markbritton-hue/MBHealth';
+const NOTIF_FILE  = 'notifications.json';
+const NTFY_TOPIC  = 'markb-healthtrack';
+
+let notifConfig = null;
+
+async function buildNotificationsTab() {
+  const pat = localStorage.getItem('notif_pat') || '';
+  const patInput = document.getElementById('notif-pat-input');
+  if (pat) {
+    patInput.value = pat;
+    document.getElementById('notif-pat-status').innerHTML = '<span style="color:var(--green)">✓ PAT loaded from storage</span>';
+  }
+
+  try {
+    const res = await fetch(`https://raw.githubusercontent.com/${NOTIF_REPO}/main/${NOTIF_FILE}?t=${Date.now()}`);
+    notifConfig = await res.json();
+  } catch(e) {
+    document.getElementById('notif-cards').innerHTML = '<div style="font-family:\'DM Mono\',monospace;font-size:13px;color:var(--red);">Could not load notifications.json from repo.</div>';
+    return;
+  }
+  renderNotifCards();
+}
+
+function renderNotifCards() {
+  const container = document.getElementById('notif-cards');
+  container.innerHTML = '';
+  notifConfig.notifications.forEach(n => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;';
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+        <div style="font-family:\'Syne\',sans-serif;font-size:14px;font-weight:700;">${n.label}</div>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex-shrink:0;margin-left:10px;">
+          <input type="checkbox" data-id="${n.id}" class="notif-toggle" ${n.enabled ? 'checked' : ''} style="width:16px;height:16px;accent-color:#f97316;cursor:pointer;">
+          <span style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--text3);">ON</span>
+        </label>
+      </div>
+      <div style="font-family:\'DM Mono\',monospace;font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.6;">${n.message}</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:\'DM Mono\',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">Time (ET)</div>
+          <input type="time" data-id="${n.id}" class="notif-time" value="${n.time}" style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-family:\'DM Mono\',monospace;font-size:13px;color:var(--text);outline:none;">
+        </div>
+        <button onclick="notifTest('${n.id}')" style="margin-top:16px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:6px 14px;font-family:\'DM Mono\',monospace;font-size:12px;color:var(--text3);cursor:pointer;">Test ▶</button>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function notifPatChanged() {}
+
+function notifSavePat() {
+  const pat = document.getElementById('notif-pat-input').value.trim();
+  if (!pat) return;
+  localStorage.setItem('notif_pat', pat);
+  document.getElementById('notif-pat-status').innerHTML = '<span style="color:var(--green)">✓ PAT saved to local storage</span>';
+}
+
+async function notifSaveAll() {
+  const statusEl = document.getElementById('notif-save-status');
+  const pat = localStorage.getItem('notif_pat');
+  if (!pat) {
+    statusEl.innerHTML = '<span style="color:var(--red)">No PAT saved — add your GitHub token above first.</span>';
+    return;
+  }
+
+  // Read updated values from UI
+  document.querySelectorAll('.notif-time').forEach(input => {
+    const n = notifConfig.notifications.find(x => x.id === input.dataset.id);
+    if (n) n.time = input.value;
+  });
+  document.querySelectorAll('.notif-toggle').forEach(cb => {
+    const n = notifConfig.notifications.find(x => x.id === cb.dataset.id);
+    if (n) n.enabled = cb.checked;
+  });
+
+  statusEl.innerHTML = '<span style="color:var(--text3)">Saving…</span>';
+
+  try {
+    // Get current file SHA
+    const metaRes = await fetch(`https://api.github.com/repos/${NOTIF_REPO}/contents/${NOTIF_FILE}`, {
+      headers: { Authorization: `Bearer ${pat}`, Accept: 'application/vnd.github+json' }
+    });
+    const meta = await metaRes.json();
+    if (!meta.sha) throw new Error(meta.message || 'Could not get file SHA');
+
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(notifConfig, null, 2) + '\n')));
+
+    const putRes = await fetch(`https://api.github.com/repos/${NOTIF_REPO}/contents/${NOTIF_FILE}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${pat}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'Update notification settings', content, sha: meta.sha })
+    });
+    const result = await putRes.json();
+    if (result.content) {
+      statusEl.innerHTML = '<span style="color:var(--green)">✓ Saved to GitHub — workflow will use new times within 5 min.</span>';
+    } else {
+      throw new Error(result.message || 'Unknown error');
+    }
+  } catch(e) {
+    statusEl.innerHTML = `<span style="color:var(--red)">✗ ${e.message}</span>`;
+  }
+}
+
+async function notifTest(id) {
+  const n = notifConfig.notifications.find(x => x.id === id);
+  if (!n) return;
+  try {
+    await fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+      method: 'POST',
+      headers: { 'Title': n.label },
+      body: n.message
+    });
+  } catch(e) {
+    console.warn('ntfy test failed', e);
+  }
+}
+
 function showTab(evt, name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -2029,6 +2182,10 @@ function showTab(evt, name) {
   if (built[name]) return;
   built[name] = true;
 
+  if (name === 'notifications') {
+    buildNotificationsTab();
+    return;
+  }
   if (name === 'keto') {
     requestAnimationFrame(buildKetoTab);
     return;
