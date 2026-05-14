@@ -49,6 +49,12 @@ window._db = getFirestore(app);
   padding:9px 8px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);
   outline:none;width:100%;box-sizing:border-box;cursor:pointer;
 }
+.lm-tab {
+  flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:none;
+  font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);cursor:pointer;transition:all .15s;
+}
+.lm-tab.active { background:#a78bfa;border-color:#a78bfa;color:#fff; }
+#lm-drop.drag-over { border-color:#a78bfa; }
 </style>
 </head>
 <body>
@@ -157,7 +163,15 @@ window._db = getFirestore(app);
       <input id="lm-notes" type="text" class="lm-input" placeholder="e.g. Fasting, ordered by Dr. Smith">
     </div>
 
-    <div style="margin:18px 0 8px;">
+    <!-- Entry mode tabs -->
+    <div style="display:flex;gap:8px;margin:16px 0 14px;">
+      <button class="lm-tab active" onclick="labTabSwitch('manual',this)">Manual Entry</button>
+      <button class="lm-tab" onclick="labTabSwitch('paste',this)">Paste Text</button>
+      <button class="lm-tab" onclick="labTabSwitch('pdf',this)">Upload PDF</button>
+    </div>
+
+    <!-- Manual entry pane -->
+    <div id="lm-pane-manual">
       <div class="lm-row-hdr">
         <div class="lm-label" style="margin:0;">Test Name</div>
         <div class="lm-label" style="margin:0;">Value &amp; Unit</div>
@@ -166,6 +180,23 @@ window._db = getFirestore(app);
       </div>
       <div id="lm-rows"></div>
       <button onclick="labAddRow()" style="margin-top:4px;background:none;border:1px dashed var(--border);border-radius:8px;padding:7px 16px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);cursor:pointer;width:100%;">+ Add test</button>
+    </div>
+
+    <!-- Paste text pane -->
+    <div id="lm-pane-paste" style="display:none;">
+      <div class="lm-label">Lab report text</div>
+      <textarea id="lm-text" class="lm-input" rows="10" style="resize:vertical;" placeholder="Paste your lab results here…"></textarea>
+    </div>
+
+    <!-- PDF upload pane -->
+    <div id="lm-pane-pdf" style="display:none;">
+      <div id="lm-drop" onclick="document.getElementById('lm-file').click()" ondragover="labDragOver(event)" ondragleave="labDragLeave(event)" ondrop="labDrop(event)" style="border:2px dashed var(--border);border-radius:10px;padding:32px;text-align:center;cursor:pointer;transition:border-color .15s;">
+        <input type="file" id="lm-file" accept=".pdf" style="display:none;" onchange="labFileSelected(this.files[0])">
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Drop PDF here or click to browse</div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">Text will be extracted automatically</div>
+      </div>
+      <div id="lm-pdf-status" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);margin-top:10px;min-height:18px;"></div>
+      <textarea id="lm-pdf-text" class="lm-input" rows="8" style="resize:vertical;margin-top:10px;display:none;" placeholder="Extracted text — edit before saving"></textarea>
     </div>
 
     <div id="lm-error" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--red);margin-top:10px;min-height:16px;"></div>
@@ -179,9 +210,13 @@ window._db = getFirestore(app);
 
 </div>
 <script src="shared-data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
 const FLAG_COLORS = { high: 'var(--red)', low: 'var(--red)', borderline: 'var(--amber)', normal: 'var(--green)', '': 'var(--text2)' };
 const FLAG_LABELS = { high: 'High', low: 'Low', borderline: 'Borderline', normal: 'Normal', '': '—' };
+let _labTab = 'manual';
 
 function labModalOpen() {
   const today = new Date().toISOString().split('T')[0];
@@ -189,15 +224,30 @@ function labModalOpen() {
   document.getElementById('lm-panel').value = '';
   document.getElementById('lm-notes').value = '';
   document.getElementById('lm-error').textContent = '';
+  document.getElementById('lm-text').value = '';
+  document.getElementById('lm-pdf-text').value = '';
+  document.getElementById('lm-pdf-text').style.display = 'none';
+  document.getElementById('lm-pdf-status').textContent = '';
+  document.getElementById('lm-file').value = '';
   document.getElementById('lm-rows').innerHTML = '';
   labAddRow();
   labAddRow();
+  labTabSwitch('manual', document.querySelector('.lm-tab'));
   document.getElementById('lab-modal-backdrop').classList.add('open');
 }
 
 function labModalClose(e) {
   if (e && e.target !== document.getElementById('lab-modal-backdrop') && e.type === 'click') return;
   document.getElementById('lab-modal-backdrop').classList.remove('open');
+}
+
+function labTabSwitch(tab, btn) {
+  _labTab = tab;
+  document.querySelectorAll('.lm-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('lm-pane-manual').style.display = tab === 'manual' ? '' : 'none';
+  document.getElementById('lm-pane-paste').style.display  = tab === 'paste'  ? '' : 'none';
+  document.getElementById('lm-pane-pdf').style.display    = tab === 'pdf'    ? '' : 'none';
 }
 
 function labAddRow() {
@@ -221,6 +271,50 @@ function labAddRow() {
   wrap.appendChild(div);
 }
 
+function labDragOver(e) {
+  e.preventDefault();
+  document.getElementById('lm-drop').classList.add('drag-over');
+}
+function labDragLeave() {
+  document.getElementById('lm-drop').classList.remove('drag-over');
+}
+function labDrop(e) {
+  e.preventDefault();
+  document.getElementById('lm-drop').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) labFileSelected(file);
+}
+
+async function labFileSelected(file) {
+  if (!file || file.type !== 'application/pdf') {
+    document.getElementById('lm-pdf-status').textContent = 'Please select a PDF file.';
+    return;
+  }
+  const statusEl = document.getElementById('lm-pdf-status');
+  statusEl.textContent = 'Extracting text…';
+  try {
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let text = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(item => item.str).join(' ') + '\n\n';
+    }
+    text = text.trim();
+    if (!text) { statusEl.textContent = 'No text found in PDF (scanned image?).'; return; }
+    statusEl.textContent = `Extracted ${pdf.numPages} page${pdf.numPages===1?'':'s'} · ${text.length.toLocaleString()} characters`;
+    const ta = document.getElementById('lm-pdf-text');
+    ta.value = text;
+    ta.style.display = '';
+    if (!document.getElementById('lm-panel').value && file.name) {
+      document.getElementById('lm-panel').value = file.name.replace(/\.pdf$/i, '');
+    }
+  } catch(err) {
+    statusEl.textContent = 'Error reading PDF: ' + err.message;
+  }
+}
+
 async function labSave() {
   const errEl = document.getElementById('lm-error');
   errEl.textContent = '';
@@ -231,22 +325,30 @@ async function labSave() {
   if (!date)  { errEl.textContent = 'Date is required.'; return; }
   if (!panel) { errEl.textContent = 'Panel / source is required.'; return; }
 
-  const rows = [...document.querySelectorAll('#lm-rows .lm-row')];
-  const tests = rows.map(r => ({
-    name:  r.querySelector('.lm-test-name').value.trim(),
-    value: r.querySelector('.lm-value').value.trim(),
-    unit:  r.querySelector('.lm-unit').value.trim(),
-    range: r.querySelector('.lm-range').value.trim(),
-    flag:  r.querySelector('.lm-flag').value,
-  })).filter(t => t.name && t.value);
+  let record;
 
-  if (!tests.length) { errEl.textContent = 'Add at least one test with a name and value.'; return; }
+  if (_labTab === 'manual') {
+    const rows = [...document.querySelectorAll('#lm-rows .lm-row')];
+    const tests = rows.map(r => ({
+      name:  r.querySelector('.lm-test-name').value.trim(),
+      value: r.querySelector('.lm-value').value.trim(),
+      unit:  r.querySelector('.lm-unit').value.trim(),
+      range: r.querySelector('.lm-range').value.trim(),
+      flag:  r.querySelector('.lm-flag').value,
+    })).filter(t => t.name && t.value);
+    if (!tests.length) { errEl.textContent = 'Add at least one test with a name and value.'; return; }
+    record = { date, panel, notes, type: 'manual', tests, createdISO: new Date().toISOString() };
+  } else {
+    const content = _labTab === 'paste'
+      ? document.getElementById('lm-text').value.trim()
+      : document.getElementById('lm-pdf-text').value.trim();
+    if (!content) { errEl.textContent = 'No content — paste text or upload a PDF.'; return; }
+    record = { date, panel, notes, type: 'text', content, createdISO: new Date().toISOString() };
+  }
 
   const btn = document.getElementById('lm-save-btn');
   btn.textContent = 'Saving…';
   btn.disabled = true;
-
-  const record = { date, panel, notes, tests, createdISO: new Date().toISOString() };
 
   try {
     const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js");
@@ -276,22 +378,30 @@ function labRender(results) {
   list.innerHTML = results.map(r => {
     const dateObj = new Date(r.date + 'T12:00:00');
     const dateStr = dateObj.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
-    const flagSummary = r.tests.filter(t => t.flag === 'high' || t.flag === 'low').map(t => t.name).join(', ');
 
-    const testRows = r.tests.map(t => {
-      const color = FLAG_COLORS[t.flag] || 'var(--text2)';
-      const badge = t.flag ? `<span style="font-size:10px;padding:1px 7px;border-radius:4px;background:${color}22;color:${color};margin-left:6px;">${FLAG_LABELS[t.flag]}</span>` : '';
-      return `<div style="display:flex;align-items:baseline;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;">
-        <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text2);">${escHtml(t.name)}${badge}</span>
-        <span style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:${color};">${escHtml(t.value)}${t.unit ? '<span style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--text3);font-weight:400;margin-left:4px;">' + escHtml(t.unit) + '</span>' : ''}${t.range ? '<span style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--text3);font-weight:400;margin-left:8px;">ref: ' + escHtml(t.range) + '</span>' : ''}</span>
-      </div>`;
-    }).join('');
+    let subline, bodyHtml;
+    if (r.type === 'text' || (!r.tests && r.content)) {
+      subline = `Text · ${r.notes || ''}`;
+      bodyHtml = `<pre style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);white-space:pre-wrap;word-break:break-word;margin:0;line-height:1.7;max-height:400px;overflow-y:auto;">${escHtml(r.content || '')}</pre>`;
+    } else {
+      const tests = r.tests || [];
+      const flagSummary = tests.filter(t => t.flag === 'high' || t.flag === 'low').map(t => t.name).join(', ');
+      subline = `${tests.length} test${tests.length===1?'':'s'}${flagSummary ? ' · <span style="color:var(--red)">High/Low: ' + escHtml(flagSummary) + '</span>' : ''}${r.notes ? ' · ' + escHtml(r.notes) : ''}`;
+      bodyHtml = tests.map(t => {
+        const color = FLAG_COLORS[t.flag] || 'var(--text2)';
+        const badge = t.flag ? `<span style="font-size:10px;padding:1px 7px;border-radius:4px;background:${color}22;color:${color};margin-left:6px;">${FLAG_LABELS[t.flag]}</span>` : '';
+        return `<div style="display:flex;align-items:baseline;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;">
+          <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text2);">${escHtml(t.name)}${badge}</span>
+          <span style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:${color};">${escHtml(t.value)}${t.unit?'<span style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--text3);font-weight:400;margin-left:4px;">'+escHtml(t.unit)+'</span>':''}${t.range?'<span style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--text3);font-weight:400;margin-left:8px;">ref: '+escHtml(t.range)+'</span>':''}</span>
+        </div>`;
+      }).join('');
+    }
 
     return `<div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid #38bdf8;border-radius:12px;overflow:hidden;">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;gap:12px;flex-wrap:wrap;" onclick="labToggle(this)">
         <div>
           <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;">${dateStr} · ${escHtml(r.panel)}</div>
-          <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">${r.tests.length} test${r.tests.length===1?'':'s'}${flagSummary ? ' · <span style="color:var(--red)">High/Low: ' + escHtml(flagSummary) + '</span>' : ''}${r.notes ? ' · ' + escHtml(r.notes) : ''}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">${subline}</div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;">
           <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">▼</span>
@@ -299,7 +409,7 @@ function labRender(results) {
         </div>
       </div>
       <div class="lab-body" style="display:none;padding:0 20px 16px;">
-        ${testRows}
+        ${bodyHtml}
       </div>
     </div>`;
   }).join('');
