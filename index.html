@@ -570,6 +570,39 @@ onSnapshot(collection(db, COLL), snap => {
 
 <!-- ══ OVERVIEW ══ -->
 <div class="panel active" id="panel-overview">
+  <div class="sec-hdr"><div class="sec-title">Current Medications</div><div class="sec-sub">As of May 11, 2026</div></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px;margin-bottom:32px;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:12px;padding:16px 18px;">
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;">Rivaroxaban 20 mg</div>
+      <div style="font-family:'DM Mono',monospace;font-size:13px;color:#38bdf8;margin-bottom:8px;">Xarelto · NEW</div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);line-height:1.7;">
+        <div>1 tablet once daily <strong>with dinner</strong></div>
+        <div style="color:var(--text3);margin-top:4px;">For: Atrial flutter with rapid ventricular response</div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:12px;padding:16px 18px;">
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;">Olmesartan-HCTZ 40-25 mg</div>
+      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--green);margin-bottom:8px;">Benicar HCT</div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);line-height:1.7;">
+        <div>1 tablet once daily</div>
+        <div style="color:var(--text3);margin-top:4px;">For: Essential hypertension</div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:12px;padding:16px 18px;">
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;">OneTouch Ultra Test Strips</div>
+      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--amber);margin-bottom:8px;">Blood Glucose Monitoring</div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);line-height:1.7;">
+        <div>2× daily</div>
+        <div style="color:var(--text3);margin-top:4px;">For: Hyperglycemia / Type 2 diabetes</div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid rgba(240,82,82,0.2);border-left:3px solid var(--red);border-radius:12px;padding:16px 18px;opacity:0.6;">
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;text-decoration:line-through;">Rosuvastatin 5 mg</div>
+      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--red);margin-bottom:8px;">Crestor · STOPPED</div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">Discontinued May 11, 2026</div>
+    </div>
+  </div>
+
   <div class="sec-hdr"><div class="sec-title">Key Concerns</div><div class="sec-sub">Markers requiring attention</div></div>
   <div class="concerns">
     <div class="ccard">
@@ -621,38 +654,6 @@ onSnapshot(collection(db, COLL), snap => {
     <div class="hcard sn" style="cursor:pointer" onclick="showTab(null,'kidney')"><div class="hcard-lbl">Creatinine</div><div class="hcard-val" style="color:var(--green)">1.04</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: 0.70–1.30</div></div></div>
   </div>
 
-  <div class="sec-hdr" style="margin-top:32px;"><div class="sec-title">Current Medications</div><div class="sec-sub">As of May 11, 2026</div></div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px;">
-    <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:12px;padding:16px 18px;">
-      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;">Rivaroxaban 20 mg</div>
-      <div style="font-family:'DM Mono',monospace;font-size:13px;color:#38bdf8;margin-bottom:8px;">Xarelto · NEW</div>
-      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);line-height:1.7;">
-        <div>1 tablet once daily <strong>with dinner</strong></div>
-        <div style="color:var(--text3);margin-top:4px;">For: Atrial flutter with rapid ventricular response</div>
-      </div>
-    </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:12px;padding:16px 18px;">
-      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;">Olmesartan-HCTZ 40-25 mg</div>
-      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--green);margin-bottom:8px;">Benicar HCT</div>
-      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);line-height:1.7;">
-        <div>1 tablet once daily</div>
-        <div style="color:var(--text3);margin-top:4px;">For: Essential hypertension</div>
-      </div>
-    </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:12px;padding:16px 18px;">
-      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;">OneTouch Ultra Test Strips</div>
-      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--amber);margin-bottom:8px;">Blood Glucose Monitoring</div>
-      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);line-height:1.7;">
-        <div>2× daily</div>
-        <div style="color:var(--text3);margin-top:4px;">For: Hyperglycemia / Type 2 diabetes</div>
-      </div>
-    </div>
-    <div style="background:var(--surface);border:1px solid rgba(240,82,82,0.2);border-left:3px solid var(--red);border-radius:12px;padding:16px 18px;opacity:0.6;">
-      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;text-decoration:line-through;">Rosuvastatin 5 mg</div>
-      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--red);margin-bottom:8px;">Crestor · STOPPED</div>
-      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">Discontinued May 11, 2026</div>
-    </div>
-  </div>
 </div>
 
 <!-- ══ CBC ══ -->
