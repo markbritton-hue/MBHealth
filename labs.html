@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Lab Results — MBHealth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <div class="pt-label">Health Dashboard</div>
+    <div class="pt-name">Personal Health Dashboard</div>
+    <div class="pt-meta">
+      <span><em>Updated</em>Apr 24, 2026</span>
+      <span><em>Source</em>MyChart · Epic Systems</span>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="updated">Last labs: <strong>Apr 24, 2026</strong></div>
+  </div>
+</header>
+
+<div id="fasting-banner" style="border-radius:10px;padding:11px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'DM Mono',monospace;font-size:13px;transition:background .5s;"></div>
+
+<a href="index.html" class="back-btn">← Home</a>
+
+<div class="sec-hdr"><div class="sec-title">Lab Results</div><div class="sec-sub">Apr 24, 2026 · MyChart / Epic Systems</div></div>
+
+<!-- Out-of-range alerts -->
+<div class="alerts" style="margin-bottom:28px;">
+  <div class="alerts-icon">⚠</div>
+  <div>
+    <div class="alerts-title">Out-of-Range Markers</div>
+    <div class="chips">
+      <div class="chip"><span class="dot"></span>Glucose 144 mg/dL</div>
+      <div class="chip"><span class="dot"></span>HbA1c 6.1%</div>
+      <div class="chip"><span class="dot"></span>LDL 149 mg/dL</div>
+      <div class="chip"><span class="dot"></span>Cholesterol 219 mg/dL</div>
+      <div class="chip"><span class="dot"></span>ApoB 108 mg/dL</div>
+      <div class="chip"><span class="dot"></span>BUN/Cr Ratio 26</div>
+      <div class="chip"><span class="dot"></span>BUN 26 mg/dL</div>
+      <div class="chip"><span class="dot"></span>Non-HDL 167 mg/dL</div>
+    </div>
+  </div>
+</div>
+
+<!-- Current Values -->
+<div class="sec-hdr"><div class="sec-title">Current Values</div><div class="sec-sub">Most recent result for each marker</div></div>
+<div class="overview-grid" style="margin-bottom:36px;">
+  <a href="glucose.html" class="hcard sh" style="text-decoration:none"><div class="hcard-lbl">Glucose</div><div class="hcard-val" style="color:var(--red)">144</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge h">High</span><div class="hcard-range">Normal: 70–99</div></div></a>
+  <a href="glucose.html" class="hcard sh" style="text-decoration:none"><div class="hcard-lbl">HbA1c</div><div class="hcard-val" style="color:var(--red)">6.1</div><div class="hcard-unit">% · Apr 2026</div><div class="hcard-foot"><span class="badge h">High</span><div class="hcard-range">Normal: 4.4–5.6%</div></div></a>
+  <a href="lipids.html"  class="hcard sh" style="text-decoration:none"><div class="hcard-lbl">LDL</div><div class="hcard-val" style="color:var(--red)">149</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge h">High</span><div class="hcard-range">Normal: &lt;100</div></div></a>
+  <a href="lipids.html"  class="hcard sh" style="text-decoration:none"><div class="hcard-lbl">Total Cholesterol</div><div class="hcard-val" style="color:var(--red)">219</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge h">High</span><div class="hcard-range">Normal: &lt;200</div></div></a>
+  <a href="lipids.html"  class="hcard sw" style="text-decoration:none"><div class="hcard-lbl">ApoB</div><div class="hcard-val" style="color:var(--amber)">108</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge w">High</span><div class="hcard-range">Optimal: &lt;90</div></div></a>
+  <a href="lipids.html"  class="hcard sn" style="text-decoration:none"><div class="hcard-lbl">HDL</div><div class="hcard-val" style="color:var(--green)">51</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal ↑</span><div class="hcard-range">Normal: &gt;39</div></div></a>
+  <a href="lipids.html"  class="hcard sn" style="text-decoration:none"><div class="hcard-lbl">Triglycerides</div><div class="hcard-val" style="color:var(--green)">97</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal ↓↓</span><div class="hcard-range">Normal: &lt;150</div></div></a>
+  <a href="keto.html"    class="hcard sw" style="text-decoration:none"><div class="hcard-lbl">Trig / HDL Ratio</div><div class="hcard-val" style="color:var(--amber)">1.90</div><div class="hcard-unit">97 ÷ 51 · Apr 2026</div><div class="hcard-foot"><span class="badge w">Above Optimal</span><div class="hcard-range">Optimal: &lt;1.5</div></div></a>
+  <a href="cbc.html"     class="hcard sn" style="text-decoration:none"><div class="hcard-lbl">WBC</div><div class="hcard-val" style="color:var(--green)">6.7</div><div class="hcard-unit">X10⁹/L · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: 4.0–11.0</div></div></a>
+  <a href="kidney.html"  class="hcard sn" style="text-decoration:none"><div class="hcard-lbl">eGFR</div><div class="hcard-val" style="color:var(--green)">85</div><div class="hcard-unit">mL/min · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: &gt;60</div></div></a>
+  <a href="thyroid.html" class="hcard sn" style="text-decoration:none"><div class="hcard-lbl">TSH</div><div class="hcard-val" style="color:var(--green)">1.36</div><div class="hcard-unit">u[iU]/mL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: 0.27–4.20</div></div></a>
+  <a href="kidney.html"  class="hcard sw" style="text-decoration:none"><div class="hcard-lbl">BUN</div><div class="hcard-val" style="color:var(--amber)">26</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge w">High</span><div class="hcard-range">Normal: 6–20</div></div></a>
+  <a href="kidney.html"  class="hcard sn" style="text-decoration:none"><div class="hcard-lbl">Creatinine</div><div class="hcard-val" style="color:var(--green)">1.04</div><div class="hcard-unit">mg/dL · Apr 2026</div><div class="hcard-foot"><span class="badge n">Normal</span><div class="hcard-range">Normal: 0.70–1.30</div></div></a>
+</div>
+
+<!-- Panel navigation -->
+<div class="sec-hdr"><div class="sec-title">Panels</div></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:32px;">
+  <a href="cbc.html"       class="home-nav-btn" style="border-left-color:#22d47a;"><span class="home-nav-icon">🔬</span><div><div class="home-nav-title">CBC</div><div class="home-nav-sub">Complete blood count</div></div></a>
+  <a href="metabolic.html" class="home-nav-btn" style="border-left-color:#f05252;"><span class="home-nav-icon">⚗️</span><div><div class="home-nav-title">Metabolic</div><div class="home-nav-sub">Comprehensive metabolic panel</div></div></a>
+  <a href="lipids.html"    class="home-nav-btn" style="border-left-color:#f5a623;"><span class="home-nav-icon">❤️</span><div><div class="home-nav-title">Lipids</div><div class="home-nav-sub">Cholesterol, triglycerides, ApoB</div></div></a>
+  <a href="kidney.html"    class="home-nav-btn" style="border-left-color:#22d47a;"><span class="home-nav-icon">🫘</span><div><div class="home-nav-title">Kidney</div><div class="home-nav-sub">eGFR, creatinine, BUN</div></div></a>
+  <a href="thyroid.html"   class="home-nav-btn" style="border-left-color:#22d47a;"><span class="home-nav-icon">🦋</span><div><div class="home-nav-title">Thyroid</div><div class="home-nav-sub">TSH history</div></div></a>
+  <a href="ecg.html"       class="home-nav-btn" style="border-left-color:#ef4444;"><span class="home-nav-icon">💓</span><div><div class="home-nav-title">ECG Monitor</div><div class="home-nav-sub">Atrial flutter monitoring</div></div></a>
+</div>
+
+</div>
+<script src="shared-data.js"></script>
+</body>
+</html>
