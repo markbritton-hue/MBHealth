@@ -8,6 +8,48 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+const app = initializeApp({
+  apiKey: "AIzaSyBgLXp-CM4izkHBXwLrcU3bSRHKZydIg0I",
+  authDomain: "healthtracker-88e01.firebaseapp.com",
+  projectId: "healthtracker-88e01",
+  storageBucket: "healthtracker-88e01.firebasestorage.app",
+  messagingSenderId: "931685187622",
+  appId: "1:931685187622:web:7adf302cefbd7c40c966e7"
+});
+window._db = getFirestore(app);
+</script>
+<style>
+#lab-modal-backdrop {
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;
+  align-items:center;justify-content:center;padding:16px;
+}
+#lab-modal-backdrop.open { display:flex; }
+#lab-modal {
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  width:100%;max-width:640px;max-height:90vh;overflow-y:auto;padding:28px;
+}
+.lm-label { font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);margin-bottom:6px; }
+.lm-input {
+  width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--border);
+  border-radius:8px;padding:9px 12px;font-family:'DM Mono',monospace;font-size:13px;
+  color:var(--text);outline:none;transition:border-color .15s;
+}
+.lm-input:focus { border-color:#a78bfa; }
+.lm-row {
+  display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px;
+}
+.lm-row-hdr {
+  display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:4px;
+}
+.flag-select {
+  background:var(--bg);border:1px solid var(--border);border-radius:8px;
+  padding:9px 8px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);
+  outline:none;width:100%;box-sizing:border-box;cursor:pointer;
+}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -70,7 +112,7 @@
 
 <!-- Panel navigation -->
 <div class="sec-hdr"><div class="sec-title">Panels</div></div>
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:32px;">
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:36px;">
   <a href="cbc.html"       class="home-nav-btn" style="border-left-color:#22d47a;"><span class="home-nav-icon">🔬</span><div><div class="home-nav-title">CBC</div><div class="home-nav-sub">Complete blood count</div></div></a>
   <a href="metabolic.html" class="home-nav-btn" style="border-left-color:#f05252;"><span class="home-nav-icon">⚗️</span><div><div class="home-nav-title">Metabolic</div><div class="home-nav-sub">Comprehensive metabolic panel</div></div></a>
   <a href="lipids.html"    class="home-nav-btn" style="border-left-color:#f5a623;"><span class="home-nav-icon">❤️</span><div><div class="home-nav-title">Lipids</div><div class="home-nav-sub">Cholesterol, triglycerides, ApoB</div></div></a>
@@ -79,7 +121,217 @@
   <a href="ecg.html"       class="home-nav-btn" style="border-left-color:#ef4444;"><span class="home-nav-icon">💓</span><div><div class="home-nav-title">ECG Monitor</div><div class="home-nav-sub">Atrial flutter monitoring</div></div></a>
 </div>
 
+<!-- Added Lab Results -->
+<div class="sec-hdr" style="margin-bottom:16px;">
+  <div>
+    <div class="sec-title">Saved Lab Results</div>
+    <div class="sec-sub" id="lab-results-sub"></div>
+  </div>
+  <button onclick="labModalOpen()" style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:8px 18px;border-radius:8px;border:none;background:#a78bfa;color:#fff;cursor:pointer;">+ Add Result</button>
+</div>
+<div id="lab-results-list" style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px;">
+  <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);padding:20px;text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:12px;">No saved lab results yet.</div>
+</div>
+
+<!-- Add Lab Result Modal -->
+<div id="lab-modal-backdrop" onclick="labModalClose(event)">
+  <div id="lab-modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">Add Lab Result</div>
+      <button onclick="labModalClose()" style="background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer;line-height:1;">✕</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div>
+        <div class="lm-label">Date</div>
+        <input id="lm-date" type="date" class="lm-input">
+      </div>
+      <div>
+        <div class="lm-label">Panel / Source</div>
+        <input id="lm-panel" type="text" class="lm-input" placeholder="e.g. CBC, Lipids, MyChart">
+      </div>
+    </div>
+
+    <div style="margin-bottom:6px;">
+      <div class="lm-label">Notes (optional)</div>
+      <input id="lm-notes" type="text" class="lm-input" placeholder="e.g. Fasting, ordered by Dr. Smith">
+    </div>
+
+    <div style="margin:18px 0 8px;">
+      <div class="lm-row-hdr">
+        <div class="lm-label" style="margin:0;">Test Name</div>
+        <div class="lm-label" style="margin:0;">Value &amp; Unit</div>
+        <div class="lm-label" style="margin:0;">Ref Range</div>
+        <div></div>
+      </div>
+      <div id="lm-rows"></div>
+      <button onclick="labAddRow()" style="margin-top:4px;background:none;border:1px dashed var(--border);border-radius:8px;padding:7px 16px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);cursor:pointer;width:100%;">+ Add test</button>
+    </div>
+
+    <div id="lm-error" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--red);margin-top:10px;min-height:16px;"></div>
+
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;">
+      <button onclick="labModalClose()" style="font-family:'DM Mono',monospace;font-size:13px;padding:9px 20px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text3);cursor:pointer;">Cancel</button>
+      <button onclick="labSave()" id="lm-save-btn" style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:9px 24px;border-radius:8px;border:none;background:#a78bfa;color:#fff;cursor:pointer;">Save</button>
+    </div>
+  </div>
+</div>
+
 </div>
 <script src="shared-data.js"></script>
+<script>
+const FLAG_COLORS = { high: 'var(--red)', low: 'var(--red)', borderline: 'var(--amber)', normal: 'var(--green)', '': 'var(--text2)' };
+const FLAG_LABELS = { high: 'High', low: 'Low', borderline: 'Borderline', normal: 'Normal', '': '—' };
+
+function labModalOpen() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('lm-date').value = today;
+  document.getElementById('lm-panel').value = '';
+  document.getElementById('lm-notes').value = '';
+  document.getElementById('lm-error').textContent = '';
+  document.getElementById('lm-rows').innerHTML = '';
+  labAddRow();
+  labAddRow();
+  document.getElementById('lab-modal-backdrop').classList.add('open');
+}
+
+function labModalClose(e) {
+  if (e && e.target !== document.getElementById('lab-modal-backdrop') && e.type === 'click') return;
+  document.getElementById('lab-modal-backdrop').classList.remove('open');
+}
+
+function labAddRow() {
+  const wrap = document.getElementById('lm-rows');
+  const div = document.createElement('div');
+  div.className = 'lm-row';
+  div.innerHTML = `
+    <input type="text" class="lm-input lm-test-name" placeholder="e.g. LDL">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+      <input type="text" class="lm-input lm-value" placeholder="149">
+      <input type="text" class="lm-input lm-unit" placeholder="mg/dL">
+    </div>
+    <input type="text" class="lm-input lm-range" placeholder="&lt;100">
+    <select class="flag-select lm-flag" title="Flag">
+      <option value="">—</option>
+      <option value="normal">Normal</option>
+      <option value="borderline">Borderline</option>
+      <option value="high">High</option>
+      <option value="low">Low</option>
+    </select>`;
+  wrap.appendChild(div);
+}
+
+async function labSave() {
+  const errEl = document.getElementById('lm-error');
+  errEl.textContent = '';
+
+  const date  = document.getElementById('lm-date').value;
+  const panel = document.getElementById('lm-panel').value.trim();
+  const notes = document.getElementById('lm-notes').value.trim();
+  if (!date)  { errEl.textContent = 'Date is required.'; return; }
+  if (!panel) { errEl.textContent = 'Panel / source is required.'; return; }
+
+  const rows = [...document.querySelectorAll('#lm-rows .lm-row')];
+  const tests = rows.map(r => ({
+    name:  r.querySelector('.lm-test-name').value.trim(),
+    value: r.querySelector('.lm-value').value.trim(),
+    unit:  r.querySelector('.lm-unit').value.trim(),
+    range: r.querySelector('.lm-range').value.trim(),
+    flag:  r.querySelector('.lm-flag').value,
+  })).filter(t => t.name && t.value);
+
+  if (!tests.length) { errEl.textContent = 'Add at least one test with a name and value.'; return; }
+
+  const btn = document.getElementById('lm-save-btn');
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+
+  const record = { date, panel, notes, tests, createdISO: new Date().toISOString() };
+
+  try {
+    const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js");
+    await setDoc(doc(window._db, 'lab_results', date + '_' + Date.now()), record);
+    labModalClose();
+  } catch(err) {
+    errEl.textContent = 'Save failed: ' + err.message;
+  } finally {
+    btn.textContent = 'Save';
+    btn.disabled = false;
+  }
+}
+
+function labRender(results) {
+  const list = document.getElementById('lab-results-list');
+  const sub  = document.getElementById('lab-results-sub');
+  if (!results.length) {
+    list.innerHTML = '<div style="font-family:\'DM Mono\',monospace;font-size:13px;color:var(--text3);padding:20px;text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:12px;">No saved lab results yet.</div>';
+    if (sub) sub.textContent = '';
+    return;
+  }
+
+  if (sub) sub.textContent = results.length + ' result set' + (results.length === 1 ? '' : 's');
+
+  results.sort((a, b) => b.date.localeCompare(a.date));
+
+  list.innerHTML = results.map(r => {
+    const dateObj = new Date(r.date + 'T12:00:00');
+    const dateStr = dateObj.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+    const flagSummary = r.tests.filter(t => t.flag === 'high' || t.flag === 'low').map(t => t.name).join(', ');
+
+    const testRows = r.tests.map(t => {
+      const color = FLAG_COLORS[t.flag] || 'var(--text2)';
+      const badge = t.flag ? `<span style="font-size:10px;padding:1px 7px;border-radius:4px;background:${color}22;color:${color};margin-left:6px;">${FLAG_LABELS[t.flag]}</span>` : '';
+      return `<div style="display:flex;align-items:baseline;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;">
+        <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text2);">${escHtml(t.name)}${badge}</span>
+        <span style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:${color};">${escHtml(t.value)}${t.unit ? '<span style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--text3);font-weight:400;margin-left:4px;">' + escHtml(t.unit) + '</span>' : ''}${t.range ? '<span style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--text3);font-weight:400;margin-left:8px;">ref: ' + escHtml(t.range) + '</span>' : ''}</span>
+      </div>`;
+    }).join('');
+
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid #38bdf8;border-radius:12px;overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;gap:12px;flex-wrap:wrap;" onclick="labToggle(this)">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;">${dateStr} · ${escHtml(r.panel)}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">${r.tests.length} test${r.tests.length===1?'':'s'}${flagSummary ? ' · <span style="color:var(--red)">High/Low: ' + escHtml(flagSummary) + '</span>' : ''}${r.notes ? ' · ' + escHtml(r.notes) : ''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">▼</span>
+          <button onclick="labDelete(event,'${r.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:4px;" title="Delete">✕</button>
+        </div>
+      </div>
+      <div class="lab-body" style="display:none;padding:0 20px 16px;">
+        ${testRows}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function labToggle(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('span');
+  const open = body.style.display === 'none';
+  body.style.display = open ? '' : 'none';
+  if (arrow) arrow.textContent = open ? '▲' : '▼';
+}
+
+async function labDelete(e, id) {
+  e.stopPropagation();
+  if (!confirm('Delete this lab result?')) return;
+  try {
+    const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js");
+    await deleteDoc(doc(window._db, 'lab_results', id));
+  } catch(err) { alert('Delete failed: ' + err.message); }
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js").then(({ collection, onSnapshot }) => {
+  onSnapshot(collection(window._db, 'lab_results'), snap => {
+    const results = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    labRender(results);
+  });
+});
+</script>
 </body>
 </html>
