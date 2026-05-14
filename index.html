@@ -533,6 +533,9 @@ onSnapshot(collection(db, COLL), snap => {
   </div>
 </header>
 
+<!-- FASTING BANNER -->
+<div id="fasting-banner" style="border-radius:10px;padding:11px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'DM Mono',monospace;font-size:13px;transition:background .5s;"></div>
+
 <!-- TABS -->
 <div class="tabs">
   <button class="tab active"  onclick="showTab(event,'overview')"><span class="tab-dot" style="background:#4f8ef7"></span>Overview</button>
@@ -2377,6 +2380,40 @@ function mgFeedback(msg, err) {
   el.style.color = err ? 'var(--red)' : 'var(--green)';
   setTimeout(() => { el.textContent = ''; }, 3000);
 }
+
+// ── FASTING BANNER ─────────────────────────────────────────────
+function updateFastingBanner() {
+  const banner = document.getElementById('fasting-banner');
+  if (!banner) return;
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  const cur = h * 60 + m;
+  const eatStart = 14 * 60;  // 2:00 PM
+  const eatEnd   = 20 * 60;  // 8:00 PM
+  const eating = cur >= eatStart && cur < eatEnd;
+
+  const remaining = eating
+    ? eatEnd - cur
+    : cur >= eatEnd ? (24 * 60 - cur) + eatStart : eatStart - cur;
+  const rh = Math.floor(remaining / 60), rm = remaining % 60;
+  const timeLeft = rh > 0 ? `${rh}h ${rm}m` : `${rm}m`;
+
+  if (eating) {
+    banner.style.background = 'rgba(34,212,122,0.08)';
+    banner.style.border = '1px solid rgba(34,212,122,0.2)';
+    banner.innerHTML = `
+      <span style="color:var(--green);font-weight:600;">🍽 Eating Window Open</span>
+      <span style="color:var(--text3);">Closes at <strong style="color:var(--text2);">8:00 PM</strong> &nbsp;·&nbsp; <strong style="color:var(--green);">${timeLeft}</strong> remaining</span>`;
+  } else {
+    banner.style.background = 'rgba(79,142,247,0.06)';
+    banner.style.border = '1px solid rgba(79,142,247,0.15)';
+    banner.innerHTML = `
+      <span style="color:var(--blue);font-weight:600;">⏳ Fasting</span>
+      <span style="color:var(--text3);">Eating window opens at <strong style="color:var(--text2);">2:00 PM</strong> &nbsp;·&nbsp; <strong style="color:var(--blue);">${timeLeft}</strong> until then</span>`;
+  }
+}
+updateFastingBanner();
+setInterval(updateFastingBanner, 60000);
 
 async function mgSendDelayedReminder(label, reading) {
   const url = `https://ntfy.sh/${NTFY_TOPIC}?title=${encodeURIComponent(label)}&message=${encodeURIComponent(`Time to test — 2h after your ${reading} mg/dL reading`)}&delay=2h`;
