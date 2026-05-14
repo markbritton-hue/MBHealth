@@ -1,0 +1,16 @@
+# Local config — contains API keys, never commit
+config.js
+
+# Medical records — PHI, never commit
+*.pdf
+*.PDF
+
+# Claude Code session files
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Handoff docs — local session notes
+docs/
