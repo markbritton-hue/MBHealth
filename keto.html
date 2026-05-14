@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Keto Analytics — MBHealth</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <div class="pt-label">Health Dashboard</div>
+    <div class="pt-name">Personal Health Dashboard</div>
+    <div class="pt-meta">
+      <span><em>Updated</em>Apr 24, 2026</span>
+      <span><em>Source</em>MyChart · Epic Systems</span>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="updated">Last labs: <strong>Apr 24, 2026</strong></div>
+  </div>
+</header>
+
+<div id="fasting-banner" style="border-radius:10px;padding:11px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'DM Mono',monospace;font-size:13px;transition:background .5s;"></div>
+
+<a href="index.html" class="back-btn">← Home</a>
+
+  <div class="keto-intro">
+    <div class="keto-intro-text">
+      <div class="keto-intro-title">Metabolic Health Analysis</div>
+      <div class="keto-intro-sub">Based on protocols from <strong>Dr. Ben Bikman</strong> (BYU, "Why We Get Sick") and <strong>Dr. Ken Berry</strong> ("Lies My Doctor Told Me") — focused on insulin resistance, keto/low-carb metabolic markers, and ratios that standard panels miss.</div>
+    </div>
+  </div>
+
+  <!-- INSULIN RESISTANCE SCORE -->
+  <div class="sec-hdr"><div class="sec-title">Insulin Resistance Assessment</div><div class="sec-sub">Proxy evaluation — fasting insulin not yet tested</div></div>
+  <div class="ir-score-block">
+    <div class="ir-gauge-wrap">
+      <canvas id="ir-gauge" width="220" height="130"></canvas>
+      <div class="ir-gauge-label">
+        <div class="ir-gauge-level" style="color:var(--red)">Likely IR</div>
+        <div class="ir-gauge-sub">Based on proxy markers</div>
+      </div>
+    </div>
+    <div class="ir-signals">
+      <div class="ir-signal bad">  <span class="ir-sig-icon">✗</span><div><strong>Fasting Glucose 144 mg/dL</strong> — consistently above 100 for 5+ years; Bikman: high glucose confirms longstanding IR</div></div>
+      <div class="ir-signal bad">  <span class="ir-sig-icon">✗</span><div><strong>HbA1c 6.1%</strong> — above 5.6% ceiling; Berry: this means average glucose ~128 mg/dL for 3 months</div></div>
+      <div class="ir-signal warn"> <span class="ir-sig-icon">~</span><div><strong>Trig/HDL 1.90</strong> — Bikman's insulin resistance proxy: above his 1.5 threshold; improving from 6.60 peak</div></div>
+      <div class="ir-signal warn"> <span class="ir-sig-icon">~</span><div><strong>Chol/HDL 4.3</strong> — Berry's target is ≤3.5; above ideal but improving</div></div>
+      <div class="ir-signal good"> <span class="ir-sig-icon">✓</span><div><strong>Triglycerides 97 mg/dL</strong> — now below 100; Bikman: excellent sign, indicates improving insulin sensitivity</div></div>
+      <div class="ir-signal good"> <span class="ir-sig-icon">✓</span><div><strong>HDL 51 mg/dL</strong> — rising trend; Berry: HDL rising on keto is a strong positive signal</div></div>
+      <div class="ir-signal missing"><span class="ir-sig-icon">?</span><div><strong>Fasting Insulin — NOT TESTED</strong> — Bikman's #1 marker; cannot calculate HOMA-IR without it. Request this immediately.</div></div>
+    </div>
+  </div>
+
+  <!-- KEY RATIOS -->
+  <div class="sec-hdr" style="margin-top:36px"><div class="sec-title">Key Metabolic Ratios</div><div class="sec-sub">Calculated from your existing lab data · Bikman &amp; Berry interpretation</div></div>
+  <div class="ratio-heroes">
+    <div class="ratio-hero">
+      <div class="ratio-hero-name">Triglyceride / HDL</div>
+      <div class="ratio-hero-val" style="color:var(--amber)">1.90</div>
+      <div class="ratio-hero-context">Apr 2026 — <span style="color:var(--amber)">Borderline</span></div>
+      <div class="ratio-hero-scale">
+        <div class="rhs-bar">
+          <div class="rhs-fill" style="width:35%;background:var(--amber)"></div>
+          <div class="rhs-marker optimal" style="left:15%">1.5</div>
+          <div class="rhs-marker danger" style="left:30%">2.0</div>
+        </div>
+      </div>
+      <div class="ratio-hero-targets">
+        <span class="rt green">Bikman optimal: &lt;1.5</span>
+        <span class="rt amber">Berry ideal: &lt;2.0</span>
+        <span class="rt red">High risk: &gt;3.0</span>
+      </div>
+      <div class="ratio-hero-note">Best proxy for LDL particle size and insulin resistance. Was <strong style="color:var(--red)">6.60</strong> in Nov 2021 — now <strong style="color:var(--amber)">1.90</strong>. Dramatic improvement.</div>
+    </div>
+    <div class="ratio-hero">
+      <div class="ratio-hero-name">Total Chol / HDL</div>
+      <div class="ratio-hero-val" style="color:var(--amber)">4.3</div>
+      <div class="ratio-hero-context">Apr 2026 — <span style="color:var(--amber)">Above ideal</span></div>
+      <div class="ratio-hero-scale">
+        <div class="rhs-bar">
+          <div class="rhs-fill" style="width:52%;background:var(--amber)"></div>
+          <div class="rhs-marker optimal" style="left:26%">3.5</div>
+          <div class="rhs-marker danger" style="left:44%">5.0</div>
+        </div>
+      </div>
+      <div class="ratio-hero-targets">
+        <span class="rt green">Berry ideal: &lt;3.5</span>
+        <span class="rt amber">Acceptable: &lt;5.0</span>
+        <span class="rt red">High risk: &gt;5.0</span>
+      </div>
+      <div class="ratio-hero-note">Was 5.5 in Nov 2021. Now at 4.3 — acceptable range but Berry's optimal target is ≤3.5. HDL needs to rise further or total cholesterol drop.</div>
+    </div>
+    <div class="ratio-hero">
+      <div class="ratio-hero-name">LDL / HDL</div>
+      <div class="ratio-hero-val" style="color:var(--amber)">2.92</div>
+      <div class="ratio-hero-context">Apr 2026 — <span style="color:var(--amber)">Above optimal</span></div>
+      <div class="ratio-hero-scale">
+        <div class="rhs-bar">
+          <div class="rhs-fill" style="width:58%;background:var(--amber)"></div>
+          <div class="rhs-marker optimal" style="left:20%">2.0</div>
+          <div class="rhs-marker danger" style="left:40%">3.5</div>
+        </div>
+      </div>
+      <div class="ratio-hero-targets">
+        <span class="rt green">Berry optimal: &lt;2.0</span>
+        <span class="rt amber">Acceptable: &lt;3.0</span>
+        <span class="rt red">Concerning: &gt;3.5</span>
+      </div>
+      <div class="ratio-hero-note">LDL of 149 vs HDL of 51. Berry: focus on raising HDL on keto rather than just lowering LDL.</div>
+    </div>
+    <div class="ratio-hero missing-ratio">
+      <div class="ratio-hero-name">HOMA-IR</div>
+      <div class="ratio-hero-val" style="color:var(--text3)">N/A</div>
+      <div class="ratio-hero-context" style="color:var(--text3)">Requires fasting insulin</div>
+      <div style="margin:14px 0;padding:12px;background:rgba(192,132,252,0.06);border:1px solid rgba(192,132,252,0.2);border-radius:8px;font-size:12px;color:var(--text2)">
+        <strong style="color:#c084fc">Formula: (Glucose × Insulin) / 405</strong><br><br>
+        With glucose of 144: you'd need insulin &lt;11.4 µIU/mL for HOMA-IR &lt;4.0<br><br>
+        <em>Bikman optimal: &lt;2.0 &nbsp;·&nbsp; General normal: &lt;1.9</em>
+      </div>
+      <div class="ratio-hero-targets">
+        <span class="rt green">Bikman optimal: &lt;2.0</span>
+        <span class="rt amber">Normal: &lt;4.0</span>
+        <span class="rt red">IR confirmed: &gt;4.0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RATIO TREND CHARTS -->
+  <div class="sec-hdr" style="margin-top:36px"><div class="sec-title">Ratio Trends Over Time</div><div class="sec-sub">Calculated from matching lipid panel dates</div></div>
+  <div class="charts-grid" id="cg-keto-ratios"></div>
+
+  <!-- WHAT THEY SAY -->
+  <div class="sec-hdr" style="margin-top:36px"><div class="sec-title">What Bikman &amp; Berry Would Say</div><div class="sec-sub">Interpretation of your specific profile</div></div>
+  <div class="doctor-cards">
+    <div class="doc-card">
+      <div class="doc-avatar" style="background:linear-gradient(135deg,#1e3a5f,#2d5a8e)">BB</div>
+      <div class="doc-body">
+        <div class="doc-name">Dr. Ben Bikman — Insulin Resistance Perspective</div>
+        <div class="doc-points">
+          <div class="doc-point red">Your fasting glucose (144) and HbA1c (6.1%) confirm you have been insulin resistant for years. <strong>Fasting insulin is the test you need most urgently.</strong></div>
+          <div class="doc-point amber">Your Trig/HDL of 1.90 is above my 1.5 optimal threshold, meaning you likely still have small, dense LDL-B particles — the dangerous kind. Your ApoB of 108 supports this.</div>
+          <div class="doc-point green">The drop in triglycerides from 277→97 is outstanding. This is the clearest sign that your insulin sensitivity is genuinely improving. Keep doing what's working.</div>
+          <div class="doc-point red">Without fasting insulin I cannot calculate HOMA-IR. This is the single most important test for understanding your metabolic health. It detects insulin resistance a decade before HbA1c changes.</div>
+        </div>
+      </div>
+    </div>
+    <div class="doc-card">
+      <div class="doc-avatar" style="background:linear-gradient(135deg,#3b1f5e,#6b35a8)">KB</div>
+      <div class="doc-body">
+        <div class="doc-name">Dr. Ken Berry — Keto/Carnivore Perspective</div>
+        <div class="doc-points">
+          <div class="doc-point red">Your HbA1c of 6.1% puts you in the prediabetes range. If you're strictly keto/carnivore, you should be driving this under 5.7%.</div>
+          <div class="doc-point amber">I'm not worried about your total cholesterol or LDL in isolation. I want your Trig/HDL ratio under 2.0 — you're at 1.90. Focus on getting HDL above 60 and triglycerides under 80.</div>
+          <div class="doc-point red">You need hsCRP (inflammation), homocysteine, Vitamin D, ferritin, and uric acid. These are completely missing from your results. Inflammation drives cardiovascular disease more than LDL.</div>
+          <div class="doc-point green">Your triglycerides going from 277 to 97 mg/dL is exactly what I see in patients who go low-carb. This is the single best marker that your dietary changes are working at the cellular level.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSING TESTS -->
+  <div class="sec-hdr" style="margin-top:36px"><div class="sec-title">Tests You Should Request</div><div class="sec-sub">Critical markers not in your current panels — recommended by Bikman &amp; Berry</div></div>
+  <div class="missing-grid">
+    <div class="missing-card priority-1">
+      <div class="missing-priority">Priority 1</div>
+      <div class="missing-name">Fasting Insulin</div>
+      <div class="missing-unit">µIU/mL</div>
+      <div class="missing-target">Bikman optimal: &lt;6 &nbsp;·&nbsp; Berry optimal: &lt;5</div>
+      <div class="missing-why">THE most important missing test. Bikman: "Fasting insulin detects insulin resistance a decade or more before glucose changes." Without it, HOMA-IR cannot be calculated.</div>
+    </div>
+    <div class="missing-card priority-1">
+      <div class="missing-priority">Priority 1</div>
+      <div class="missing-name">hsCRP</div>
+      <div class="missing-unit">mg/L (high-sensitivity C-Reactive Protein)</div>
+      <div class="missing-target">Optimal: &lt;1.0 &nbsp;·&nbsp; Elevated risk: &gt;3.0</div>
+      <div class="missing-why">Berry's top inflammation marker. Cardiovascular disease is largely an inflammatory process. With elevated glucose and elevated LDL, your hsCRP could be a critical piece of the picture.</div>
+    </div>
+    <div class="missing-card priority-2">
+      <div class="missing-priority">Priority 2</div>
+      <div class="missing-name">Uric Acid</div>
+      <div class="missing-unit">mg/dL</div>
+      <div class="missing-target">Bikman optimal: &lt;5.5 &nbsp;·&nbsp; Standard: &lt;7.0</div>
+      <div class="missing-why">Bikman lists uric acid as one of his three core heart disease markers. Elevated uric acid correlates with insulin resistance and fructose metabolism.</div>
+    </div>
+    <div class="missing-card priority-2">
+      <div class="missing-priority">Priority 2</div>
+      <div class="missing-name">Vitamin D (25-OH)</div>
+      <div class="missing-unit">ng/mL</div>
+      <div class="missing-target">Berry optimal: 60–80 &nbsp;·&nbsp; Standard min: &gt;30</div>
+      <div class="missing-why">Berry calls Vitamin D deficiency epidemic. Low Vitamin D correlates with insulin resistance, poor immune function, and cardiovascular risk.</div>
+    </div>
+    <div class="missing-card priority-2">
+      <div class="missing-priority">Priority 2</div>
+      <div class="missing-name">Homocysteine</div>
+      <div class="missing-unit">µmol/L</div>
+      <div class="missing-target">Optimal: &lt;7 &nbsp;·&nbsp; Elevated: &gt;10 &nbsp;·&nbsp; High risk: &gt;15</div>
+      <div class="missing-why">Berry: "Homocysteine is a far better cardiovascular risk marker than LDL." Elevated homocysteine directly damages arterial walls.</div>
+    </div>
+    <div class="missing-card priority-2">
+      <div class="missing-priority">Priority 2</div>
+      <div class="missing-name">Free T3 &amp; Free T4</div>
+      <div class="missing-unit">pg/mL &amp; ng/dL</div>
+      <div class="missing-target">TSH alone is not sufficient per Berry</div>
+      <div class="missing-why">Berry: "TSH is a pituitary hormone — it tells you what the brain is asking for, not what the thyroid is delivering." Hypothyroidism worsens insulin resistance and cardiovascular risk.</div>
+    </div>
+    <div class="missing-card priority-3">
+      <div class="missing-priority">Priority 3</div>
+      <div class="missing-name">Ferritin</div>
+      <div class="missing-unit">ng/mL</div>
+      <div class="missing-target">Optimal: 50–150 (men) &nbsp;·&nbsp; High: &gt;300</div>
+      <div class="missing-why">Berry: Ferritin is both an iron storage and inflammation marker. Elevated ferritin can indicate chronic inflammation even when CRP appears normal.</div>
+    </div>
+    <div class="missing-card priority-3">
+      <div class="missing-priority">Priority 3</div>
+      <div class="missing-name">ApoA1</div>
+      <div class="missing-unit">mg/dL</div>
+      <div class="missing-target">You have ApoB (108) — ApoA1 completes the ratio</div>
+      <div class="missing-why">You already have ApoB tested. Adding ApoA1 gives the ApoB/ApoA1 ratio — one of the strongest cardiovascular risk predictors available. ApoB/ApoA1 &lt;0.9 is optimal.</div>
+    </div>
+    <div class="missing-card priority-3">
+      <div class="missing-priority">Priority 3</div>
+      <div class="missing-name">C-Peptide</div>
+      <div class="missing-unit">ng/mL</div>
+      <div class="missing-target">Optimal: 0.8–1.8 &nbsp;·&nbsp; High indicates IR</div>
+      <div class="missing-why">Bikman and Berry both recommend C-peptide as a measure of insulin secretion by the pancreas. Shows how hard your pancreas is working to control blood sugar.</div>
+    </div>
+  </div>
+
+</div>
+<script src="shared-data.js"></script>
+<script>
+buildKetoTab();
+</script>
+</body>
+</html>

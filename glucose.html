@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Glucose Tracker — MBHealth</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+const app = initializeApp({
+  apiKey: "AIzaSyBgLXp-CM4izkHBXwLrcU3bSRHKZydIg0I",
+  authDomain: "healthtracker-88e01.firebaseapp.com",
+  projectId: "healthtracker-88e01",
+  storageBucket: "healthtracker-88e01.firebasestorage.app",
+  messagingSenderId: "931685187622",
+  appId: "1:931685187622:web:7adf302cefbd7c40c966e7"
+});
+const db = getFirestore(app);
+window._db   = db;
+window._coll = 'glucose_readings';
+onSnapshot(collection(db, 'glucose_readings'), snap => {
+  const entries = snap.docs.map(d => d.data()).sort((a,b) => a.date.localeCompare(b.date));
+  window._mgEntries = entries;
+  if (window.mgRefresh) mgRefresh();
+});
+</script>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <div class="pt-label">Health Dashboard</div>
+    <div class="pt-name">Personal Health Dashboard</div>
+    <div class="pt-meta">
+      <span><em>Updated</em>Apr 24, 2026</span>
+      <span><em>Source</em>MyChart · Epic Systems</span>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="updated">Last labs: <strong>Apr 24, 2026</strong></div>
+  </div>
+</header>
+
+<div id="fasting-banner" style="border-radius:10px;padding:11px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'DM Mono',monospace;font-size:13px;transition:background .5s;"></div>
+
+<a href="index.html" class="back-btn">← Home</a>
+
+  <!-- PAGE HEADER -->
+  <div class="gt-page-header">
+    <div class="gt-page-title-block">
+      <div class="gt-page-eyebrow">Personal Health · Daily Monitoring</div>
+      <div class="gt-page-title">Glucose Tracker</div>
+      <div class="gt-page-sub">Fasting · pre &amp; post meal readings · HbA1c history · all data stored in Firebase</div>
+    </div>
+    <div class="gt-targets">
+      <div class="gt-target-row"><span class="gt-target-lbl">Fasting target</span><span class="gt-target-val" style="color:var(--green)">&lt; 100 mg/dL</span></div>
+      <div class="gt-target-row"><span class="gt-target-lbl">Post-meal (2h)</span><span class="gt-target-val" style="color:var(--green)">&lt; 140 mg/dL</span></div>
+      <div class="gt-target-row"><span class="gt-target-lbl">HbA1c target</span><span class="gt-target-val" style="color:var(--green)">&lt; 5.7%</span></div>
+      <div class="gt-target-row"><span class="gt-target-lbl">Meal spike</span><span class="gt-target-val" style="color:var(--green)">&lt; 30 mg/dL</span></div>
+    </div>
+  </div>
+
+  <!-- STATS STRIP -->
+  <div class="mg-stats">
+    <div class="mg-stat-card"><div class="mg-stat-lbl">Fasting 7-Day Avg</div><div class="mg-stat-val" id="mgs-7-val">—</div><div class="mg-stat-sub">mg/dL</div></div>
+    <div class="mg-stat-card"><div class="mg-stat-lbl">Post-Meal Avg</div><div class="mg-stat-val" id="mgs-post-val">—</div><div class="mg-stat-sub">mg/dL · all meals</div></div>
+    <div class="mg-stat-card"><div class="mg-stat-lbl">Avg Meal Spike</div><div class="mg-stat-val" id="mgs-spike-val">—</div><div class="mg-stat-sub">post minus pre</div></div>
+    <div class="mg-stat-card"><div class="mg-stat-lbl">Latest Fasting</div><div class="mg-stat-val" id="mgs-latest-val">—</div><div class="mg-stat-sub" id="mgs-latest-date">—</div></div>
+    <div class="mg-stat-card"><div class="mg-stat-lbl">Fasting Trend</div><div class="mg-stat-val" id="mgs-trend-val">—</div><div class="mg-stat-sub">vs prior 7 days</div></div>
+    <div class="mg-stat-card"><div class="mg-stat-lbl">Time in Range</div><div class="mg-stat-val" id="mgs-tir-val">—</div><div class="mg-stat-sub">readings &lt;140 mg/dL</div></div>
+  </div>
+
+  <!-- TIME IN RANGE BAR -->
+  <div id="mg-tir-wrap" style="display:none; margin-bottom:20px">
+    <div class="gt-tir-label">Time in Range breakdown</div>
+    <div class="gt-tir-bar" id="gt-tir-bar"></div>
+    <div class="gt-tir-legend">
+      <span><span class="mg-leg-dot" style="background:var(--green)"></span>Normal (&lt;100)</span>
+      <span><span class="mg-leg-dot" style="background:var(--amber)"></span>Prediabetic (100–139)</span>
+      <span><span class="mg-leg-dot" style="background:var(--red)"></span>High (≥140)</span>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="gt-main-layout">
+    <div class="gt-log-col">
+      <div class="mg-input-card">
+        <div class="mg-input-title">Log Readings</div>
+        <div class="mg-top-row">
+          <div class="mg-field" style="flex:0 0 155px">
+            <label class="mg-label">Date</label>
+            <input type="date" id="mg-date" class="mg-input">
+          </div>
+          <div class="mg-field" style="flex:1">
+            <label class="mg-label">Notes <span class="mg-unit">optional</span></label>
+            <input type="text" id="mg-note" class="mg-input" placeholder="e.g. keto day 3, 14h fast, walked 30 min">
+          </div>
+        </div>
+        <div class="mg-slots-grid">
+          <div class="mg-slot gt-slot-fasting">
+            <div class="mg-slot-label">🌅 Fasting</div><div class="mg-slot-sub">Before eating</div>
+            <input type="number" id="mg-fasting" class="mg-slot-input" placeholder="mg/dL" min="40" max="500">
+          </div>
+          <div class="mg-slot">
+            <div class="mg-slot-label">🍽 Pre-Breakfast</div><div class="mg-slot-sub">Before meal</div>
+            <input type="number" id="mg-pre-breakfast" class="mg-slot-input" placeholder="mg/dL" min="40" max="500">
+          </div>
+          <div class="mg-slot">
+            <div class="mg-slot-label">📈 Post-Breakfast</div><div class="mg-slot-sub">~2h after</div>
+            <input type="number" id="mg-post-breakfast" class="mg-slot-input" placeholder="mg/dL" min="40" max="500">
+          </div>
+          <div class="mg-slot">
+            <div class="mg-slot-label">🍽 Pre-Lunch</div><div class="mg-slot-sub">Before meal</div>
+            <input type="number" id="mg-pre-lunch" class="mg-slot-input" placeholder="mg/dL" min="40" max="500">
+          </div>
+          <div class="mg-slot">
+            <div class="mg-slot-label">📈 Post-Lunch</div><div class="mg-slot-sub">~2h after</div>
+            <input type="number" id="mg-post-lunch" class="mg-slot-input" placeholder="mg/dL" min="40" max="500">
+          </div>
+          <div class="mg-slot">
+            <div class="mg-slot-label">🍽 Pre-Dinner</div><div class="mg-slot-sub">Before meal</div>
+            <input type="number" id="mg-pre-dinner" class="mg-slot-input" placeholder="mg/dL" min="40" max="500">
+          </div>
+          <div class="mg-slot">
+            <div class="mg-slot-label">📈 Post-Dinner</div><div class="mg-slot-sub">~2h after</div>
+            <input type="number" id="mg-post-dinner" class="mg-slot-input" placeholder="mg/dL" min="40" max="500">
+          </div>
+          <div class="mg-slot">
+            <div class="mg-slot-label">🌙 Bedtime</div><div class="mg-slot-sub">Before sleep</div>
+            <input type="number" id="mg-bedtime" class="mg-slot-input" placeholder="mg/dL" min="40" max="500">
+          </div>
+        </div>
+        <div class="mg-btn-row">
+          <button class="mg-btn" onclick="mgAdd()">+ Save Entry</button>
+          <div id="mg-feedback" class="mg-feedback"></div>
+        </div>
+      </div>
+      <div id="mg-today-summary" style="display:none">
+        <div class="gt-today-card">
+          <div class="gt-today-title">Today's Summary</div>
+          <div id="gt-today-body"></div>
+        </div>
+      </div>
+    </div>
+    <div class="gt-charts-col">
+      <div id="mg-chart-wrap" style="display:none">
+        <div class="mg-chart-card" style="margin-bottom:16px">
+          <div class="mg-chart-header">
+            <div class="mg-chart-title">Fasting Glucose Trend</div>
+            <div class="mg-chart-legend">
+              <span class="mg-leg-dot" style="background:var(--green)"></span><span>&lt;100</span>
+              <span class="mg-leg-dot" style="background:var(--amber)"></span><span>100–125</span>
+              <span class="mg-leg-dot" style="background:var(--red)"></span><span>&gt;125</span>
+            </div>
+          </div>
+          <div style="position:relative;height:190px"><canvas id="mg-chart-fasting"></canvas></div>
+        </div>
+        <div class="mg-chart-card">
+          <div class="mg-chart-header">
+            <div class="mg-chart-title">Pre vs Post Meal</div>
+            <div class="mg-chart-legend">
+              <span class="mg-leg-dot" style="background:var(--blue)"></span><span>Pre</span>
+              <span class="mg-leg-dot" style="background:var(--amber)"></span><span>Post</span>
+            </div>
+          </div>
+          <div style="position:relative;height:190px"><canvas id="mg-chart-meals"></canvas></div>
+        </div>
+      </div>
+      <div id="mg-empty-state" class="gt-empty-state">
+        <div class="gt-empty-icon">📊</div>
+        <div class="gt-empty-title">No readings yet</div>
+        <div class="gt-empty-sub">Log your first glucose reading and charts will appear here</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL LOG TABLE -->
+  <div id="mg-table-wrap" style="display:none; margin-top:28px">
+    <div class="sec-hdr"><div class="sec-title">Full Reading Log</div><div class="sec-sub" id="mg-entry-count"></div></div>
+    <div class="mg-table-scroll">
+      <table class="mg-table">
+        <thead>
+          <tr>
+            <th>Date</th><th>Fasting</th>
+            <th title="Pre-Breakfast">Pre-B</th><th title="Post-Breakfast">Post-B</th><th title="Spike">↑ B</th>
+            <th title="Pre-Lunch">Pre-L</th><th title="Post-Lunch">Post-L</th><th title="Spike">↑ L</th>
+            <th title="Pre-Dinner">Pre-D</th><th title="Post-Dinner">Post-D</th><th title="Spike">↑ D</th>
+            <th>Bedtime</th><th>Notes</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="mg-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- WEEKLY SUMMARY -->
+  <div id="mg-weekly-wrap" style="display:none; margin-top:28px">
+    <div class="sec-hdr"><div class="sec-title">Weekly Summary</div><div class="sec-sub">Fasting averages by week</div></div>
+    <div style="position:relative;height:180px"><canvas id="mg-chart-weekly"></canvas></div>
+  </div>
+
+  <!-- HbA1c LAB HISTORY -->
+  <div class="sec-hdr" style="margin-top:40px">
+    <div class="sec-title">Lab History — HbA1c &amp; Estimated Avg Glucose</div>
+    <div class="sec-sub">From MyChart · Feb 2022 – Apr 2026 · current HbA1c 6.1% (prediabetes range)</div>
+  </div>
+  <div class="charts-grid" id="cg-diabetes"></div>
+
+</div>
+<script src="shared-data.js"></script>
+<script>
+const NTFY_TOPIC = 'markb-healthtrack';
+let mgChart1 = null, mgChart2 = null;
+window._mgEntries = [];
+
+function mgColorClass(v) {
+  if (!v && v !== 0) return 'mg-val-em';
+  if (v < 100) return 'mg-val-n';
+  if (v <= 125) return 'mg-val-w';
+  return 'mg-val-h';
+}
+function mgFmt(v) {
+  if (v === null || v === undefined || v === '') return '<span class="mg-val-em">—</span>';
+  const cls = mgColorClass(Number(v));
+  return `<span class="${cls}">${v}</span>`;
+}
+
+async function mgAdd() {
+  const date = document.getElementById('mg-date').value;
+  if (!date) { mgFeedback('Please select a date.', true); return; }
+  const slots = ['fasting','pre-breakfast','post-breakfast','pre-lunch','post-lunch','pre-dinner','post-dinner','bedtime'];
+  const vals = {};
+  let hasAny = false;
+  slots.forEach(s => {
+    const el = document.getElementById('mg-' + s);
+    const v = el ? el.value.trim() : '';
+    vals[s] = v !== '' ? Number(v) : null;
+    if (v !== '') hasAny = true;
+  });
+  if (!hasAny) { mgFeedback('Enter at least one reading.', true); return; }
+  const note = document.getElementById('mg-note').value.trim();
+  const existing = (window._mgEntries || []).find(e => e.date === date) || {};
+  const filledVals = Object.fromEntries(Object.entries(vals).filter(([,v]) => v !== null));
+  const entry = { ...existing, ...filledVals, date, note: note || existing.note || '' };
+  try {
+    mgFeedback('Saving…');
+    const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js");
+    await setDoc(doc(window._db, window._coll, date), entry);
+    const premealMap = { 'pre-lunch': 'Post-Lunch Check', 'pre-dinner': 'Post-Dinner Check' };
+    for (const [slot, label] of Object.entries(premealMap)) {
+      if (vals[slot] !== null) mgSendDelayedReminder(label, vals[slot]);
+    }
+    slots.forEach(s => { const el = document.getElementById('mg-' + s); if (el) el.value = ''; });
+    document.getElementById('mg-note').value = '';
+    mgFeedback('Saved ✓');
+  } catch(e) {
+    mgFeedback('Error saving: ' + e.message, true);
+  }
+}
+
+function mgFeedback(msg, err) {
+  const el = document.getElementById('mg-feedback');
+  el.textContent = msg;
+  el.style.color = err ? 'var(--red)' : 'var(--green)';
+  setTimeout(() => { el.textContent = ''; }, 3000);
+}
+
+async function mgSendDelayedReminder(label, reading) {
+  const url = `https://ntfy.sh/${NTFY_TOPIC}?title=${encodeURIComponent(label)}&message=${encodeURIComponent(`Time to test — 2h after your ${reading} mg/dL reading`)}&delay=2h`;
+  try { await fetch(url, { method: 'POST' }); } catch(e) { console.warn('delayed ntfy failed', e); }
+}
+
+async function mgDelete(date) {
+  try {
+    const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js");
+    await deleteDoc(doc(window._db, window._coll, date));
+  } catch(e) { mgFeedback('Error deleting: ' + e.message, true); }
+}
+
+window.mgRefresh = function mgRefresh() {
+  const entries = window._mgEntries || [];
+  const hasData = entries.length > 0;
+  document.getElementById('mg-chart-wrap').style.display  = hasData ? 'block' : 'none';
+  document.getElementById('mg-table-wrap').style.display  = hasData ? 'block' : 'none';
+
+  const fastings = entries.map(e => e.fasting).filter(v => v !== null && v !== undefined);
+  const recent7  = entries.slice(-7).map(e => e.fasting).filter(v => v !== null);
+  const prior7   = entries.slice(-14, -7).map(e => e.fasting).filter(v => v !== null);
+  const avg = arr => arr.length ? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : null;
+
+  const postVals = [], spikeVals = [];
+  entries.forEach(e => {
+    ['breakfast','lunch','dinner'].forEach(meal => {
+      const pre = e[`pre-${meal}`], post = e[`post-${meal}`];
+      if (post !== null && post !== undefined) postVals.push(post);
+      if (pre !== null && pre !== undefined && post !== null && post !== undefined) spikeVals.push(post - pre);
+    });
+  });
+
+  const avg7 = avg(recent7), avgPost = avg(postVals);
+  const avgSpike = spikeVals.length ? Math.round(spikeVals.reduce((a,b)=>a+b,0)/spikeVals.length) : null;
+  const latest = fastings.length ? fastings[fastings.length-1] : null;
+  const latestDate = fastings.length ? entries.filter(e=>e.fasting!==null&&e.fasting!==undefined).slice(-1)[0].date : null;
+
+  const setVal = (id, v) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (v === null) { el.textContent = '—'; el.style.color = 'var(--text3)'; return; }
+    el.textContent = v;
+    el.style.color = v < 100 ? 'var(--green)' : v <= 125 ? 'var(--amber)' : 'var(--red)';
+  };
+  setVal('mgs-7-val', avg7);
+  setVal('mgs-post-val', avgPost);
+  const spikeEl = document.getElementById('mgs-spike-val');
+  if (spikeEl) {
+    spikeEl.textContent = avgSpike !== null ? (avgSpike >= 0 ? '+' : '') + avgSpike : '—';
+    spikeEl.style.color = avgSpike === null ? 'var(--text3)' : avgSpike > 40 ? 'var(--red)' : avgSpike > 20 ? 'var(--amber)' : 'var(--green)';
+  }
+  setVal('mgs-latest-val', latest);
+  const ldEl = document.getElementById('mgs-latest-date');
+  if (ldEl) ldEl.textContent = latestDate || '—';
+
+  const trendEl = document.getElementById('mgs-trend-val');
+  if (trendEl) {
+    const a7 = avg(recent7), a7p = avg(prior7);
+    if (a7 !== null && a7p !== null) {
+      const diff = a7 - a7p;
+      trendEl.textContent = (diff >= 0 ? '▲ +' : '▼ ') + diff;
+      trendEl.style.color = diff > 0 ? 'var(--red)' : 'var(--green)';
+    } else { trendEl.textContent = '—'; trendEl.style.color = 'var(--text3)'; }
+  }
+
+  const fDates = entries.filter(e=>e.fasting!==null&&e.fasting!==undefined).map(e=>e.date);
+  const fVals  = entries.filter(e=>e.fasting!==null&&e.fasting!==undefined).map(e=>e.fasting);
+  const fColors = fVals.map(v => v < 100 ? '#22d47a' : v <= 125 ? '#f5a623' : '#f05252');
+  if (mgChart1) { mgChart1.destroy(); mgChart1 = null; }
+  const c1 = document.getElementById('mg-chart-fasting');
+  if (c1 && fDates.length) {
+    mgChart1 = new Chart(c1, {
+      type: 'line',
+      data: { labels: fDates, datasets: [{ label: 'Fasting', data: fVals, borderColor: '#4f8ef7', backgroundColor: 'rgba(79,142,247,0.08)', pointBackgroundColor: fColors, pointBorderColor: fColors, pointRadius: 5, pointHoverRadius: 7, tension: 0.3, fill: true, borderWidth: 2 }] },
+      plugins: [makeBandPlugin({ lo: 0, hi: 99 })],
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.raw} mg/dL` } } },
+        scales: {
+          x: { grid: { color: 'rgba(99,140,210,0.07)' }, ticks: { color: '#4d6488', font: { family:"'DM Mono',monospace", size:9 }, maxTicksLimit: 10 } },
+          y: { grid: { color: 'rgba(99,140,210,0.07)' }, ticks: { color: '#4d6488', font: { family:"'DM Mono',monospace", size:9 }, callback: v => v+' mg/dL' }, min: 60 }
+        }
+      }
+    });
+  }
+
+  const mealEntries = entries.filter(e => ['breakfast','lunch','dinner'].some(m => e[`pre-${m}`] !== null && e[`pre-${m}`] !== undefined)).slice(-14);
+  const mLabels = [], preData = [], postData = [];
+  mealEntries.forEach(e => {
+    ['breakfast','lunch','dinner'].forEach(meal => {
+      const pre = e[`pre-${meal}`], post = e[`post-${meal}`];
+      if (pre !== null && pre !== undefined) {
+        mLabels.push(e.date + ' ' + meal.slice(0,1).toUpperCase());
+        preData.push(pre);
+        postData.push(post !== null && post !== undefined ? post : null);
+      }
+    });
+  });
+  if (mgChart2) { mgChart2.destroy(); mgChart2 = null; }
+  const c2 = document.getElementById('mg-chart-meals');
+  if (c2 && mLabels.length) {
+    mgChart2 = new Chart(c2, {
+      type: 'bar',
+      data: { labels: mLabels, datasets: [
+        { label: 'Pre-meal',  data: preData,  backgroundColor: 'rgba(79,142,247,0.6)',  borderColor: '#4f8ef7', borderWidth: 1, borderRadius: 3 },
+        { label: 'Post-meal', data: postData, backgroundColor: 'rgba(245,166,35,0.6)', borderColor: '#f5a623', borderWidth: 1, borderRadius: 3 }
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: true, labels: { color:'#8fa3c4', font:{ family:"'DM Mono',monospace", size:10 }, boxWidth:12 } }, tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${c.raw ?? '—'} mg/dL` } } },
+        scales: {
+          x: { grid: { color:'rgba(99,140,210,0.07)' }, ticks: { color:'#4d6488', font:{ family:"'DM Mono',monospace", size:9 }, maxTicksLimit:14 } },
+          y: { grid: { color:'rgba(99,140,210,0.07)' }, ticks: { color:'#4d6488', font:{ family:"'DM Mono',monospace", size:9 }, callback: v=>v+' mg/dL' }, min:60 }
+        }
+      }
+    });
+  }
+
+  const allReadings = [];
+  entries.forEach(e => { ['fasting','pre-breakfast','post-breakfast','pre-lunch','post-lunch','pre-dinner','post-dinner','bedtime'].forEach(k => { if (e[k] !== null && e[k] !== undefined) allReadings.push(e[k]); }); });
+  const tirNorm = allReadings.filter(v=>v<100).length, tirPre = allReadings.filter(v=>v>=100&&v<140).length, tirHigh = allReadings.filter(v=>v>=140).length, tirTotal = allReadings.length;
+  const tirEl = document.getElementById('mgs-tir-val');
+  if (tirEl && tirTotal > 0) { const pct = Math.round((tirNorm+tirPre)/tirTotal*100); tirEl.textContent = pct + '%'; tirEl.style.color = pct >= 80 ? 'var(--green)' : pct >= 60 ? 'var(--amber)' : 'var(--red)'; }
+  const tirWrap = document.getElementById('mg-tir-wrap'), tirBar = document.getElementById('gt-tir-bar');
+  if (tirWrap && tirBar && tirTotal > 0) {
+    tirWrap.style.display = 'block';
+    const pN = (tirNorm/tirTotal*100).toFixed(1), pP = (tirPre/tirTotal*100).toFixed(1), pH = (tirHigh/tirTotal*100).toFixed(1);
+    tirBar.innerHTML = `<div style="width:${pN}%;background:var(--green)" title="Normal: ${pN}%"></div><div style="width:${pP}%;background:var(--amber)" title="Prediabetic: ${pP}%"></div><div style="width:${pH}%;background:var(--red)" title="High: ${pH}%"></div>`;
+  }
+
+  const emptyEl = document.getElementById('mg-empty-state');
+  if (emptyEl) emptyEl.style.display = hasData ? 'none' : 'flex';
+
+  const weeklyWrap = document.getElementById('mg-weekly-wrap');
+  if (weeklyWrap) weeklyWrap.style.display = entries.length >= 3 ? 'block' : 'none';
+  if (entries.length >= 3) {
+    const weekMap = {};
+    entries.forEach(e => {
+      if (e.fasting === null || e.fasting === undefined) return;
+      const d = new Date(e.date + 'T00:00:00');
+      const sun = new Date(d); sun.setDate(d.getDate() - d.getDay());
+      const wk = sun.toISOString().slice(0,10);
+      if (!weekMap[wk]) weekMap[wk] = [];
+      weekMap[wk].push(e.fasting);
+    });
+    const wkLabels = Object.keys(weekMap).sort();
+    const wkAvgs = wkLabels.map(k => Math.round(weekMap[k].reduce((a,b)=>a+b,0)/weekMap[k].length));
+    if (!window._mgWeekChart) {
+      const wc = document.getElementById('mg-chart-weekly');
+      if (wc) window._mgWeekChart = new Chart(wc, {
+        type: 'bar',
+        data: { labels: wkLabels.map(d => 'Wk ' + d.slice(5)), datasets: [{ label: 'Avg Fasting', data: wkAvgs, backgroundColor: wkAvgs.map(v => v<100?'rgba(34,212,122,0.6)':v<=125?'rgba(245,166,35,0.6)':'rgba(240,82,82,0.6)'), borderColor: wkAvgs.map(v => v<100?'#22d47a':v<=125?'#f5a623':'#f05252'), borderWidth:1, borderRadius:4 }] },
+        options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>` Avg: ${c.raw} mg/dL`}} }, scales:{ x:{grid:{color:'rgba(99,140,210,0.07)'},ticks:{color:'#4d6488',font:{family:"'DM Mono',monospace",size:9}}}, y:{grid:{color:'rgba(99,140,210,0.07)'},ticks:{color:'#4d6488',font:{family:"'DM Mono',monospace",size:9},callback:v=>v+' mg/dL'},min:60} } }
+      });
+    } else {
+      window._mgWeekChart.data.labels = wkLabels.map(d=>'Wk '+d.slice(5));
+      window._mgWeekChart.data.datasets[0].data = wkAvgs;
+      window._mgWeekChart.data.datasets[0].backgroundColor = wkAvgs.map(v=>v<100?'rgba(34,212,122,0.6)':v<=125?'rgba(245,166,35,0.6)':'rgba(240,82,82,0.6)');
+      window._mgWeekChart.update();
+    }
+  }
+
+  const cnt = document.getElementById('mg-entry-count');
+  if (cnt) cnt.textContent = entries.length + ' entr' + (entries.length===1?'y':'ies');
+  const tbody = document.getElementById('mg-tbody');
+  if (!tbody) return;
+
+  function spikeCell(pre, post) {
+    if (pre===null||pre===undefined||post===null||post===undefined) return '<span class="mg-val-em">—</span>';
+    const d = post - pre;
+    const cls = d > 40 ? 'mg-val-h' : d > 20 ? 'mg-val-w' : 'mg-val-n';
+    return `<span class="${cls}">${d>=0?'+':''}${d}</span>`;
+  }
+
+  tbody.innerHTML = [...entries].reverse().map(e => `
+    <tr>
+      <td style="font-weight:600;color:var(--text)">${e.date}</td>
+      <td>${mgFmt(e.fasting)}</td>
+      <td>${mgFmt(e['pre-breakfast'])}</td><td>${mgFmt(e['post-breakfast'])}</td><td>${spikeCell(e['pre-breakfast'],e['post-breakfast'])}</td>
+      <td>${mgFmt(e['pre-lunch'])}</td><td>${mgFmt(e['post-lunch'])}</td><td>${spikeCell(e['pre-lunch'],e['post-lunch'])}</td>
+      <td>${mgFmt(e['pre-dinner'])}</td><td>${mgFmt(e['post-dinner'])}</td><td>${spikeCell(e['pre-dinner'],e['post-dinner'])}</td>
+      <td>${mgFmt(e.bedtime)}</td>
+      <td style="color:var(--text3);font-size:10px;max-width:140px;overflow:hidden;text-overflow:ellipsis">${e.note||''}</td>
+      <td><button class="mg-del" onclick="mgDelete('${e.date}')" title="Delete">✕</button></td>
+    </tr>`).join('');
+
+  const today = new Date().toISOString().slice(0,10);
+  const todayEntry = entries.find(e => e.date === today);
+  const summWrap = document.getElementById('mg-today-summary'), summBody = document.getElementById('gt-today-body');
+  if (summWrap && summBody && todayEntry) {
+    summWrap.style.display = 'block';
+    const meals = [
+      {label:'Fasting',   pre:null,                        post:todayEntry.fasting},
+      {label:'Breakfast', pre:todayEntry['pre-breakfast'], post:todayEntry['post-breakfast']},
+      {label:'Lunch',     pre:todayEntry['pre-lunch'],     post:todayEntry['post-lunch']},
+      {label:'Dinner',    pre:todayEntry['pre-dinner'],    post:todayEntry['post-dinner']},
+      {label:'Bedtime',   pre:null,                        post:todayEntry.bedtime},
+    ];
+    summBody.innerHTML = meals.filter(m=>m.post!==null&&m.post!==undefined).map(m => {
+      const spike = (m.pre!==null&&m.pre!==undefined&&m.post!==null) ? `<span class="gt-today-spike">(+${m.post-m.pre} spike)</span>` : '';
+      return `<div class="gt-today-row"><span>${m.label}</span><span>${mgFmt(m.post)} mg/dL ${spike}</span></div>`;
+    }).join('') || '<div style="color:var(--text3);font-size:12px">No readings logged for today yet</div>';
+  } else if (summWrap) {
+    summWrap.style.display = 'none';
+  }
+};
+
+// Build HbA1c charts
+document.addEventListener('DOMContentLoaded', () => {
+  const grid = document.getElementById('cg-diabetes');
+  ['a1c','eavgglc'].forEach(k => buildCard(grid, k));
+  document.getElementById('mg-date').value = new Date().toISOString().slice(0,10);
+});
+</script>
+</body>
+</html>

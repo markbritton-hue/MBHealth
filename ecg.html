@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>ECG Monitor — MBHealth</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <div class="pt-label">Health Dashboard</div>
+    <div class="pt-name">Personal Health Dashboard</div>
+    <div class="pt-meta">
+      <span><em>Updated</em>Apr 24, 2026</span>
+      <span><em>Source</em>MyChart · Epic Systems</span>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="updated">Last labs: <strong>Apr 24, 2026</strong></div>
+  </div>
+</header>
+
+<div id="fasting-banner" style="border-radius:10px;padding:11px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'DM Mono',monospace;font-size:13px;transition:background .5s;"></div>
+
+<a href="index.html" class="back-btn">← Home</a>
+
+  <!-- SERIOUS ALERT BANNER -->
+  <div class="ecg-alert-banner">
+    <div class="ecg-alert-icon">⚡</div>
+    <div>
+      <div class="ecg-alert-title">2 Serious Cardiac Events Detected</div>
+      <div class="ecg-alert-body">Paroxysmal Atrial Flutter with Rapid Ventricular Response (RVR) detected on April 30, 2026 at 8:14 PM — lasting 2 minutes 52 seconds. Auto-detected and technician reviewed. Interpreted by Cardiologist.</div>
+    </div>
+  </div>
+
+  <!-- STUDY INFO -->
+  <div class="ecg-meta-row">
+    <div class="ecg-meta-card">
+      <div class="ecg-meta-label">Study Type</div>
+      <div class="ecg-meta-val">Long Term Monitor</div>
+      <div class="ecg-meta-sub">BodyGuardian Mini PLUS Lite</div>
+    </div>
+    <div class="ecg-meta-card">
+      <div class="ecg-meta-label">Monitoring Period</div>
+      <div class="ecg-meta-val">14 Days</div>
+      <div class="ecg-meta-sub">Apr 23 – May 6, 2026</div>
+    </div>
+    <div class="ecg-meta-card">
+      <div class="ecg-meta-label">Data Quality</div>
+      <div class="ecg-meta-val">95%</div>
+      <div class="ecg-meta-sub">12d 23h 37m diagnostic</div>
+    </div>
+    <div class="ecg-meta-card">
+      <div class="ecg-meta-label">Total Beats</div>
+      <div class="ecg-meta-val">1,337,410</div>
+      <div class="ecg-meta-sub">100% classified</div>
+    </div>
+    <div class="ecg-meta-card">
+      <div class="ecg-meta-label">Indication</div>
+      <div class="ecg-meta-val">Palpitations</div>
+      <div class="ecg-meta-sub">R00.2 — Ordering Physician</div>
+    </div>
+    <div class="ecg-meta-card">
+      <div class="ecg-meta-label">Interpreting MD</div>
+      <div class="ecg-meta-val" style="font-size:14px">Cardiologist</div>
+      <div class="ecg-meta-sub">Cardiologist</div>
+    </div>
+  </div>
+
+  <!-- CONCLUSIONS -->
+  <div class="sec-hdr"><div class="sec-title">Study Conclusions</div><div class="sec-sub">Electronically signed by Cardiologist · May 7, 2026</div></div>
+  <div class="ecg-conclusions">
+    <div class="ecg-conclusion normal"><div class="ecg-c-dot"></div><div><strong>Baseline rhythm is normal sinus rhythm</strong> — dominant rhythm throughout the monitoring period</div></div>
+    <div class="ecg-conclusion normal"><div class="ecg-c-dot"></div><div><strong>Mild sinus bradycardia</strong> — heart rate periodically dropping below 60 BPM, particularly overnight; trending more frequent in final days</div></div>
+    <div class="ecg-conclusion normal"><div class="ecg-c-dot"></div><div><strong>Sinus tachycardia</strong> — heart rate periodically exceeding 100 BPM; longest episode 1h 2m on Apr 25</div></div>
+    <div class="ecg-conclusion watch"><div class="ecg-c-dot"></div><div><strong>Rare PACs and PVCs</strong> — Premature Atrial Contractions (SVE: 3,117 beats, &lt;1%) and Premature Ventricular Contractions (VE: 104 beats, &lt;1%); both within acceptable range</div></div>
+    <div class="ecg-conclusion serious"><div class="ecg-c-dot"></div><div><strong>Paroxysmal atrial flutter with RVR</strong> — most significant finding; occurred April 30 at 8:14 PM, lasted 2 min 52 sec with heart rate 127–128 BPM; auto-detected and confirmed by technician</div></div>
+    <div class="ecg-conclusion normal"><div class="ecg-c-dot"></div><div><strong>No symptoms reported</strong> — no patient-triggered symptom events; no pauses ≥ 3 seconds recorded</div></div>
+  </div>
+
+  <!-- HR STATS GRID -->
+  <div class="sec-hdr" style="margin-top:36px"><div class="sec-title">Heart Rate Statistics</div><div class="sec-sub">14-day summary · All times CDT</div></div>
+  <div class="hr-stats-grid">
+    <div class="hr-stat-block">
+      <div class="hr-stat-title">Overall</div>
+      <div class="hr-stat-rows">
+        <div class="hr-stat-row"><span>Maximum</span><span class="hr-val warn">142 BPM</span><span class="hr-date">Apr 30, 8:15 PM</span></div>
+        <div class="hr-stat-row"><span>Minimum</span><span class="hr-val ok">51 BPM</span><span class="hr-date">May 3, 4:27 AM</span></div>
+        <div class="hr-stat-row"><span>Average</span><span class="hr-val ok">74 BPM</span><span class="hr-date">—</span></div>
+        <div class="hr-stat-row"><span>Pauses ≥ 3s</span><span class="hr-val ok">0</span><span class="hr-date">None detected</span></div>
+      </div>
+    </div>
+    <div class="hr-stat-block">
+      <div class="hr-stat-title" style="color:var(--red)">Afib / Flutter <span class="hrsb-pct">&lt;1% of time</span></div>
+      <div class="hr-stat-rows">
+        <div class="hr-stat-row"><span>Maximum</span><span class="hr-val crit">142 BPM</span><span class="hr-date">Apr 30</span></div>
+        <div class="hr-stat-row"><span>Minimum</span><span class="hr-val crit">97 BPM</span><span class="hr-date">Apr 30</span></div>
+        <div class="hr-stat-row"><span>Average</span><span class="hr-val crit">125 BPM</span><span class="hr-date">—</span></div>
+        <div class="hr-stat-row"><span>Longest episode</span><span class="hr-val crit">2m 52s</span><span class="hr-date">Apr 30, 8:14 PM</span></div>
+      </div>
+    </div>
+    <div class="hr-stat-block">
+      <div class="hr-stat-title">Tachycardia <span class="hrsb-pct">4% of time</span></div>
+      <div class="hr-stat-rows">
+        <div class="hr-stat-row"><span>Maximum</span><span class="hr-val warn">140 BPM</span><span class="hr-date">Apr 25, 2:37 PM</span></div>
+        <div class="hr-stat-row"><span>Minimum</span><span class="hr-val warn">101 BPM</span><span class="hr-date">Apr 23, 9:02 AM</span></div>
+        <div class="hr-stat-row"><span>Average</span><span class="hr-val warn">110 BPM</span><span class="hr-date">—</span></div>
+        <div class="hr-stat-row"><span>Longest episode</span><span class="hr-val warn">1h 2m</span><span class="hr-date">Apr 25, 2:00 PM</span></div>
+      </div>
+    </div>
+    <div class="hr-stat-block">
+      <div class="hr-stat-title">Bradycardia <span class="hrsb-pct">9% of time</span></div>
+      <div class="hr-stat-rows">
+        <div class="hr-stat-row"><span>Maximum</span><span class="hr-val ok">59 BPM</span><span class="hr-date">Apr 24, 4:44 AM</span></div>
+        <div class="hr-stat-row"><span>Minimum</span><span class="hr-val warn">51 BPM</span><span class="hr-date">May 3, 4:27 AM</span></div>
+        <div class="hr-stat-row"><span>Average</span><span class="hr-val ok">57 BPM</span><span class="hr-date">—</span></div>
+        <div class="hr-stat-row"><span>Longest episode</span><span class="hr-val warn">32m 51s</span><span class="hr-date">May 3, 3:11 AM</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEAT COMPOSITION + DAILY RHYTHM CHART -->
+  <div class="ecg-charts-row">
+    <div class="ecg-chart-card" style="max-width:320px">
+      <div class="ecg-chart-title">Beat Composition</div>
+      <div class="ecg-chart-sub">1,337,410 total beats · 14 days</div>
+      <div class="cc-wrap" style="height:200px;margin-top:12px"><canvas id="ecg-beats-pie"></canvas></div>
+      <div class="beat-legend">
+        <div class="beat-leg-row"><span class="blr-dot" style="background:#22d47a"></span><span>Normal</span><span class="blr-val">1,333,518</span></div>
+        <div class="beat-leg-row"><span class="blr-dot" style="background:#f5a623"></span><span>SVE (PAC)</span><span class="blr-val">3,117</span></div>
+        <div class="beat-leg-row"><span class="blr-dot" style="background:#f05252"></span><span>VE (PVC)</span><span class="blr-val">104</span></div>
+        <div class="beat-leg-row"><span class="blr-dot" style="background:#4d6488"></span><span>Other</span><span class="blr-val">671</span></div>
+      </div>
+    </div>
+    <div class="ecg-chart-card" style="flex:1">
+      <div class="ecg-chart-title">Daily Rhythm Burden</div>
+      <div class="ecg-chart-sub">Tachycardia &amp; Bradycardia as % of each day</div>
+      <div class="cc-wrap" style="height:220px;margin-top:12px"><canvas id="ecg-daily-chart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- EVENT TABLE -->
+  <div class="sec-hdr" style="margin-top:36px"><div class="sec-title">Recorded Events</div><div class="sec-sub">5 total · 0 critical · 2 serious · 3 stable</div></div>
+  <div class="event-table-wrap">
+    <table class="event-table">
+      <thead>
+        <tr><th>#</th><th>Date &amp; Time</th><th>Acuity</th><th>Event</th><th>HR</th><th>Trigger</th><th>Activity</th></tr>
+      </thead>
+      <tbody>
+        <tr class="ev-serious">
+          <td>1</td><td>Apr 30, 2026 · 8:14 PM CDT</td>
+          <td><span class="ev-badge serious">Serious</span></td>
+          <td>Sinus Rhythm, Atrial Flutter</td><td>127.0 BPM</td><td>Auto-Detected</td><td>Wireless Event</td>
+        </tr>
+        <tr class="ev-serious">
+          <td>2</td><td>Apr 30, 2026 · 8:15 PM CDT</td>
+          <td><span class="ev-badge serious">Serious</span></td>
+          <td>Atrial Flutter w/MF PVCs</td><td>128.0 BPM</td><td>Auto-Detected</td><td>Wireless Event</td>
+        </tr>
+        <tr>
+          <td>3</td><td>Apr 23, 2026 · 8:00 AM CDT</td>
+          <td><span class="ev-badge stable">Stable</span></td>
+          <td>Sinus Rhythm (Baseline)</td><td>86.1 BPM</td><td>Patient-Activated</td><td>Unavailable</td>
+        </tr>
+        <tr>
+          <td>4</td><td>Apr 26, 2026 · 11:17 AM CDT</td>
+          <td><span class="ev-badge stable">Stable</span></td>
+          <td>Sinus Rhythm</td><td>64.0 BPM</td><td>Patient-Activated</td><td>Unavailable</td>
+        </tr>
+        <tr>
+          <td>5</td><td>May 1, 2026 · 2:40 AM CDT</td>
+          <td><span class="ev-badge stable">Stable</span></td>
+          <td>Sinus Rhythm w/PACs</td><td>67.0 BPM</td><td>Auto-Detected</td><td>Wireless Event</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CLINICAL CONTEXT -->
+  <div class="sec-hdr" style="margin-top:36px"><div class="sec-title">Clinical Context</div><div class="sec-sub">What these findings mean for your overall health picture</div></div>
+  <div class="ecg-context-grid">
+    <div class="ecg-ctx-card ctx-serious">
+      <div class="ecg-ctx-title">⚡ Atrial Flutter — What It Means</div>
+      <div class="ecg-ctx-body">Atrial flutter is a rapid, organized electrical circuit in the upper chambers of the heart causing them to beat 250–350 times/minute. With RVR (Rapid Ventricular Response), the lower chambers follow too fast (127–128 BPM). Your episode lasted ~3 minutes and self-terminated. Unlike persistent AFib, paroxysmal flutter can be managed, but it does increase stroke risk and may progress — follow-up with your cardiologist is important.</div>
+    </div>
+    <div class="ecg-ctx-card ctx-warning">
+      <div class="ecg-ctx-title">📈 Bradycardia Trend — Worsening</div>
+      <div class="ecg-ctx-body">Bradycardia (HR &lt;60) occupied 9% of the monitoring period, with a clear upward trend in the final days: 13%, 14%, 18%, 20% on May 3–6. This is predominantly nocturnal (longest episode 32m 51s at 3:11 AM). While some bradycardia is normal during sleep, the increasing trend warrants monitoring.</div>
+    </div>
+    <div class="ecg-ctx-card ctx-warning">
+      <div class="ecg-ctx-title">🔗 Metabolic Connection</div>
+      <div class="ecg-ctx-body">Your prediabetes / insulin resistance (HbA1c 6.1%, glucose 144 mg/dL) significantly increases atrial flutter/fibrillation risk. Chronically elevated glucose causes atrial fibrosis and inflammation — the same substrate that generates flutter circuits. Improving metabolic control is one of the most effective ways to reduce arrhythmia burden.</div>
+    </div>
+    <div class="ecg-ctx-card ctx-info">
+      <div class="ecg-ctx-title">✅ Reassuring Findings</div>
+      <div class="ecg-ctx-body">Zero critical events over 14 days. No pauses ≥ 3 seconds. VE and SVE burdens both well under 1%. The atrial flutter episode was brief (under 3 minutes) and self-terminated without intervention. Baseline rhythm is normal sinus. Average resting HR of 74 BPM is in a healthy range.</div>
+    </div>
+  </div>
+
+  <!-- CT ANGIOGRAM -->
+  <div class="sec-hdr" style="margin-top:36px">
+    <div class="sec-title">Coronary CT Angiogram (CCTA)</div>
+    <div class="sec-sub">Scheduled · Results pending</div>
+  </div>
+  <div class="ecg-alert-banner" style="border-left-color:var(--blue); background:linear-gradient(135deg,rgba(79,142,247,0.09),rgba(34,212,122,0.04))">
+    <div class="ecg-alert-icon">🔬</div>
+    <div>
+      <div class="ecg-alert-title" style="color:var(--blue)">Procedure Scheduled — What to Expect</div>
+      <div class="ecg-alert-body">A <strong>non-invasive 3D X-ray of your coronary arteries</strong> using contrast dye injected through an IV. No catheter. ~10–15 minutes in the scanner. You'll be given a beta blocker beforehand to slow your heart rate (ideally below 60 BPM) for sharper images — <strong>mention your bradycardia trend to the tech</strong>. Avoid caffeine for 24h prior. Results typically available within 24–48h via MyChart.</div>
+    </div>
+  </div>
+
+  <!-- NON-STATIN LIPID MANAGEMENT -->
+  <div class="sec-hdr" style="margin-top:42px">
+    <div class="sec-title">Non-Statin Lipid &amp; Cardiovascular Risk Reduction</div>
+    <div class="sec-sub">Evidence-based alternatives if you prefer to avoid statins</div>
+  </div>
+  <div class="ecg-alert-banner" style="border-left-color:var(--amber); background:linear-gradient(135deg,rgba(245,166,35,0.07),rgba(79,142,247,0.05))">
+    <div class="ecg-alert-icon">⚖️</div>
+    <div>
+      <div class="ecg-alert-title" style="color:var(--amber)">Context: Statins vs. Alternatives</div>
+      <div class="ecg-alert-body">Statins lower LDL-C by 30–50% and have strong trial evidence for reducing heart attacks in high-risk patients. However, <strong>ApoB and LDL particle number matter more than LDL-C</strong> — and several non-statin approaches meaningfully reduce these. If your CTA shows no or minimal plaque, the urgency for aggressive drug therapy decreases significantly. <strong>Present your CTA results before making a final decision.</strong></div>
+    </div>
+  </div>
+  <div class="ecg-context-grid" style="margin-top:18px">
+    <div class="ecg-ctx-card ctx-serious">
+      <div class="ecg-ctx-title">💊 Bempedoic Acid (Nexletol)</div>
+      <div class="ecg-ctx-body"><strong>Newest non-statin drug</strong> — FDA approved 2020. Works upstream of statins but only activates in the liver (not muscles), so <strong>no muscle pain/weakness side effects</strong>. Lowers LDL-C by ~18–25%, ApoB by ~15%. CLEAR Outcomes trial (2023) confirmed it reduces major cardiovascular events.</div>
+    </div>
+    <div class="ecg-ctx-card ctx-serious">
+      <div class="ecg-ctx-title">💉 PCSK9 Inhibitors (Repatha / Praluent)</div>
+      <div class="ecg-ctx-body">Injectable biologic (every 2–4 weeks) that blocks PCSK9 protein. <strong>Lowers LDL-C by 50–60%, ApoB by ~50%</strong> — the most powerful non-statin option. No muscle side effects. Strong trial evidence (FOURIER, ODYSSEY).</div>
+    </div>
+    <div class="ecg-ctx-card ctx-warning">
+      <div class="ecg-ctx-title">💊 Ezetimibe (Zetia)</div>
+      <div class="ecg-ctx-body">Blocks cholesterol absorption in the small intestine. <strong>Lowers LDL-C by 15–20%</strong>, ApoB by ~12%. Well-tolerated, cheap (generic available). Often a good first step.</div>
+    </div>
+    <div class="ecg-ctx-card ctx-warning">
+      <div class="ecg-ctx-title">🐟 High-Dose EPA Omega-3 (Vascepa)</div>
+      <div class="ecg-ctx-body">Prescription-grade pure EPA omega-3 (4g/day). <strong>REDUCE-IT trial</strong>: 25% reduction in major cardiovascular events in insulin-resistant / prediabetic patients. Also reduces inflammation (hsCRP). Distinctly different from OTC fish oil.</div>
+    </div>
+    <div class="ecg-ctx-card ctx-info">
+      <div class="ecg-ctx-title">🥩 Low-Carb / Ketogenic Diet (Bikman Protocol)</div>
+      <div class="ecg-ctx-body">Your Trig/HDL ratio has dramatically improved (from ~4.4 to 1.9) — strong evidence your insulin resistance and particle pattern are improving. Low-carb diets typically: lower triglycerides 30–50%, raise HDL, reduce small dense LDL, lower ApoB in insulin-resistant patients.</div>
+    </div>
+    <div class="ecg-ctx-card ctx-info">
+      <div class="ecg-ctx-title">📊 The Test That Changes Everything: NMR LipoProfile</div>
+      <div class="ecg-ctx-body">Standard lipid panels measure LDL <em>cholesterol content</em> — not particle number or size. An <strong>NMR LipoProfile</strong> measures LDL particle number (LDL-P) and size directly. <strong>Your improving Trig/HDL ratio (now 1.9) suggests you're shifting toward Pattern A (large, fluffy).</strong></div>
+    </div>
+  </div>
+
+  <!-- CARDIOLOGIST RECOMMENDATIONS -->
+  <div class="sec-hdr" style="margin-top:36px">
+    <div class="sec-title">What Your Cardiologist Will Likely Recommend</div>
+    <div class="sec-sub">Based on these findings — not a substitute for your appointment</div>
+  </div>
+  <div class="ecg-alert-banner" style="border-left-color:var(--red); background:linear-gradient(135deg,rgba(240,82,82,0.09),rgba(245,166,35,0.05))">
+    <div class="ecg-alert-icon">🩺</div>
+    <div>
+      <div class="ecg-alert-title" style="color:var(--red)">Atrial Flutter Requires Direct Follow-Up</div>
+      <div class="ecg-alert-body">Two auto-detected atrial flutter events at 127–128 BPM on Apr 30 are the most clinically significant finding. Expect your cardiologist to discuss stroke risk stratification and likely treatment options at your next visit.</div>
+    </div>
+  </div>
+  <div class="ecg-context-grid" style="margin-top:18px">
+    <div class="ecg-ctx-card ctx-serious">
+      <div class="ecg-ctx-title">Stroke Risk Assessment (CHA₂DS₂-VASc)</div>
+      <div class="ecg-ctx-body">Atrial flutter carries the same stroke risk as AFib. Your CHA₂DS₂-VASc score given your age (57) and prediabetes is likely <strong>2+</strong>, which typically crosses the threshold where <strong>anticoagulation therapy is recommended</strong> (e.g., rivaroxaban/Xarelto). Expect this conversation at your visit.</div>
+    </div>
+    <div class="ecg-ctx-card ctx-serious">
+      <div class="ecg-ctx-title">Catheter Ablation Discussion</div>
+      <div class="ecg-ctx-body">Typical isthmus-dependent atrial flutter has an <strong>extremely high ablation success rate — 95%+</strong>. It is a low-risk, 1–2 hour procedure that can eliminate flutter circuits permanently. Your cardiologist may recommend ablation as a curative option rather than long-term rate control medications.</div>
+    </div>
+    <div class="ecg-ctx-card ctx-warning">
+      <div class="ecg-ctx-title">Rate or Rhythm Control Decision</div>
+      <div class="ecg-ctx-body">If ablation is deferred, your cardiologist will choose between <strong>rate control</strong> vs <strong>rhythm control</strong>. Given your bradycardia burden (9%, trending up), <strong>beta blockers may be avoided</strong> — they could worsen the nocturnal drops to &lt;51 BPM.</div>
+    </div>
+    <div class="ecg-ctx-card ctx-info">
+      <div class="ecg-ctx-title">Echocardiogram (Echo) Likely Ordered</div>
+      <div class="ecg-ctx-body">Standard workup after documented atrial flutter includes a <strong>transthoracic echocardiogram</strong> to assess left atrial size, left ventricular function, and any structural abnormalities. A dilated left atrium increases arrhythmia risk.</div>
+    </div>
+  </div>
+  <div class="ecg-conclusions" style="margin-top:20px">
+    <div class="ecg-conclusion info">
+      <div class="ecg-conc-icon">📋</div>
+      <div class="ecg-conc-text"><strong>Questions to ask your cardiologist:</strong> What is my CHA₂DS₂-VASc score and do I need a blood thinner? Am I a candidate for ablation? Is my bradycardia a concern with any medications you're considering? Should I get an echocardiogram?</div>
+    </div>
+    <div class="ecg-conclusion normal">
+      <div class="ecg-conc-icon">✅</div>
+      <div class="ecg-conc-text"><strong>Positive framing:</strong> Catching paroxysmal atrial flutter this early — before it becomes persistent — is exactly what monitoring is designed to do. Typical flutter is one of the most treatable arrhythmias in cardiology.</div>
+    </div>
+  </div>
+
+</div>
+<script src="shared-data.js"></script>
+<script>
+buildECGCharts();
+</script>
+</body>
+</html>
