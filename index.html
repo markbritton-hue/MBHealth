@@ -2354,6 +2354,15 @@ async function mgAdd() {
     mgFeedback('Saving…');
     const { doc, setDoc, collection } = await import("https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js");
     await setDoc(doc(window._db, window._coll, date), entry);
+
+    // Fire delayed ntfy reminder 2h after any pre-meal reading
+    const premealMap = { 'pre-lunch': 'Post-Lunch Check', 'pre-dinner': 'Post-Dinner Check' };
+    for (const [slot, label] of Object.entries(premealMap)) {
+      if (vals[slot] !== null) {
+        mgSendDelayedReminder(label, vals[slot]);
+      }
+    }
+
     slots.forEach(s => { const el = document.getElementById('mg-' + s); if (el) el.value = ''; });
     document.getElementById('mg-note').value = '';
     mgFeedback('Saved ✓');
@@ -2367,6 +2376,15 @@ function mgFeedback(msg, err) {
   el.textContent = msg;
   el.style.color = err ? 'var(--red)' : 'var(--green)';
   setTimeout(() => { el.textContent = ''; }, 3000);
+}
+
+async function mgSendDelayedReminder(label, reading) {
+  const url = `https://ntfy.sh/${NTFY_TOPIC}?title=${encodeURIComponent(label)}&message=${encodeURIComponent(`Time to test — 2h after your ${reading} mg/dL reading`)}&delay=2h`;
+  try {
+    await fetch(url, { method: 'POST' });
+  } catch(e) {
+    console.warn('delayed ntfy failed', e);
+  }
 }
 
 async function mgDelete(date) {
