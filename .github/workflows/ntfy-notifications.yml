@@ -19,14 +19,20 @@ jobs:
       - name: Send due notifications
         env:
           TEST_ID: ${{ github.event.inputs.test_id }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: |
           python3 << 'EOF'
-          import json, subprocess, os
+          import json, os, urllib.request, urllib.error
           from datetime import datetime
           from zoneinfo import ZoneInfo
 
           with open('notifications.json') as f:
               config = json.load(f)
+
+          topic = os.environ.get('NTFY_TOPIC', '').strip()
+          if not topic:
+              print('ERROR: NTFY_TOPIC secret is not set')
+              exit(1)
 
           tz = ZoneInfo(config['timezone'])
           now = datetime.now(tz)
@@ -46,16 +52,17 @@ jobs:
                   if not (cur >= due and cur < due + 5):
                       continue
 
-              result = subprocess.run([
-                  'curl', '-s', '-o', '/dev/null', '-w', '%{http_code}',
-                  '-H', f"Title: {n['label']}",
-                  '-d', n['message'],
-                  'https://ntfy.sh/markb-healthtrack'
-              ], capture_output=True, text=True)
-
-              status = result.stdout.strip()
-              icon = '✓' if status == '200' else '✗'
-              print(f"{icon} [{status}] {n['label']} — {n['time']}")
+              try:
+                  req = urllib.request.Request(
+                      f'https://ntfy.sh/{topic}',
+                      data=n['message'].encode(),
+                      headers={'Title': n['label']},
+                      method='POST'
+                  )
+                  with urllib.request.urlopen(req, timeout=10) as resp:
+                      print(f"✓ [{resp.status}] {n['label']} — {n['time']}")
+              except urllib.error.URLError as e:
+                  print(f"✗ {n['label']} — {e}")
               sent += 1
 
           if sent == 0:
