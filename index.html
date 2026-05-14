@@ -572,6 +572,8 @@ onSnapshot(collection(db, COLL), snap => {
 <div class="panel active" id="panel-overview">
   <div class="sec-hdr"><div class="sec-title">Current Medications</div><div class="sec-sub">As of May 11, 2026</div></div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px;margin-bottom:32px;">
+
+    <!-- Rivaroxaban -->
     <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:12px;padding:16px 18px;">
       <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;">Rivaroxaban 20 mg</div>
       <div style="font-family:'DM Mono',monospace;font-size:13px;color:#38bdf8;margin-bottom:8px;">Xarelto · NEW</div>
@@ -579,7 +581,21 @@ onSnapshot(collection(db, COLL), snap => {
         <div>1 tablet once daily <strong>with dinner</strong></div>
         <div style="color:var(--text3);margin-top:4px;">For: Atrial flutter with rapid ventricular response</div>
       </div>
+      <button onclick="medToggle(this)" style="margin-top:12px;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);cursor:pointer;width:100%;text-align:left;">▶ Side effects</button>
+      <div style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-family:'DM Mono',monospace;font-size:12px;line-height:1.8;">
+        <div style="color:var(--red);font-weight:600;margin-bottom:6px;">⚠ Serious</div>
+        <div style="color:var(--text2);">· Bleeding risk — cuts take longer to stop</div>
+        <div style="color:var(--text2);">· Internal bleeding (stomach, intestinal)</div>
+        <div style="color:var(--text2);">· Spinal bleeding if you have epidurals</div>
+        <div style="color:var(--amber);font-weight:600;margin:8px 0 6px;">~ Common</div>
+        <div style="color:var(--text2);">· Bruising more easily</div>
+        <div style="color:var(--text2);">· Nausea, stomach upset</div>
+        <div style="color:var(--text2);">· Muscle pain or weakness</div>
+        <div style="color:var(--text3);margin-top:8px;font-size:11px;">⚕ Tell your doctor about any unusual bleeding, blood in urine/stool, or prolonged bleeding from cuts.</div>
+      </div>
     </div>
+
+    <!-- Benicar HCT -->
     <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:12px;padding:16px 18px;">
       <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;">Olmesartan-HCTZ 40-25 mg</div>
       <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--green);margin-bottom:8px;">Benicar HCT</div>
@@ -587,7 +603,22 @@ onSnapshot(collection(db, COLL), snap => {
         <div>1 tablet once daily</div>
         <div style="color:var(--text3);margin-top:4px;">For: Essential hypertension</div>
       </div>
+      <button onclick="medToggle(this)" style="margin-top:12px;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);cursor:pointer;width:100%;text-align:left;">▶ Side effects</button>
+      <div style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-family:'DM Mono',monospace;font-size:12px;line-height:1.8;">
+        <div style="color:var(--red);font-weight:600;margin-bottom:6px;">⚠ Serious</div>
+        <div style="color:var(--text2);">· Severe diarrhea / weight loss (olmesartan enteropathy — rare)</div>
+        <div style="color:var(--text2);">· Kidney function decline</div>
+        <div style="color:var(--text2);">· Low potassium (muscle cramps, weakness)</div>
+        <div style="color:var(--amber);font-weight:600;margin:8px 0 6px;">~ Common</div>
+        <div style="color:var(--text2);">· Dizziness, lightheadedness (esp. standing up)</div>
+        <div style="color:var(--text2);">· Increased urination (HCTZ diuretic effect)</div>
+        <div style="color:var(--text2);">· Elevated blood sugar — relevant given your diabetes</div>
+        <div style="color:var(--text2);">· Sensitivity to sunlight</div>
+        <div style="color:var(--text3);margin-top:8px;font-size:11px;">⚕ HCTZ can raise glucose — monitor readings closely on carnivore/fasting.</div>
+      </div>
     </div>
+
+    <!-- OneTouch -->
     <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:12px;padding:16px 18px;">
       <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;">OneTouch Ultra Test Strips</div>
       <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--amber);margin-bottom:8px;">Blood Glucose Monitoring</div>
@@ -595,12 +626,31 @@ onSnapshot(collection(db, COLL), snap => {
         <div>2× daily</div>
         <div style="color:var(--text3);margin-top:4px;">For: Hyperglycemia / Type 2 diabetes</div>
       </div>
+      <button onclick="medToggle(this)" style="margin-top:12px;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);cursor:pointer;width:100%;text-align:left;">▶ Usage tips</button>
+      <div style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-family:'DM Mono',monospace;font-size:12px;line-height:1.8;">
+        <div style="color:var(--green);font-weight:600;margin-bottom:6px;">✓ No side effects (device)</div>
+        <div style="color:var(--text2);">· Test fasting in the morning before eating</div>
+        <div style="color:var(--text2);">· Test post-meal 1–2 hrs after eating</div>
+        <div style="color:var(--text2);">· Wash hands before testing — food residue skews results</div>
+        <div style="color:var(--text2);">· Store strips below 86°F, away from humidity</div>
+        <div style="color:var(--text3);margin-top:8px;font-size:11px;">⚕ Log readings in the Glucose Tracker tab to see your trends.</div>
+      </div>
     </div>
+
+    <!-- Crestor stopped -->
     <div style="background:var(--surface);border:1px solid rgba(240,82,82,0.2);border-left:3px solid var(--red);border-radius:12px;padding:16px 18px;opacity:0.6;">
       <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;text-decoration:line-through;">Rosuvastatin 5 mg</div>
       <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--red);margin-bottom:8px;">Crestor · STOPPED</div>
-      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);">Discontinued May 11, 2026</div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);margin-bottom:12px;">Discontinued May 11, 2026</div>
+      <button onclick="medToggle(this)" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);cursor:pointer;width:100%;text-align:left;">▶ Why it was stopped</button>
+      <div style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-family:'DM Mono',monospace;font-size:12px;line-height:1.8;">
+        <div style="color:var(--text2);">· Stopped by PCP on May 11, 2026</div>
+        <div style="color:var(--text2);">· CT coronary angiography ordered to assess actual plaque burden before deciding on statin therapy</div>
+        <div style="color:var(--text2);">· Known side effects: muscle pain/weakness, liver enzyme elevation, raised blood sugar</div>
+        <div style="color:var(--text3);margin-top:8px;font-size:11px;">⚕ Cardiology may revisit statin use after CTA results.</div>
+      </div>
     </div>
+
   </div>
 
   <div class="sec-hdr"><div class="sec-title">Key Concerns</div><div class="sec-sub">Markers requiring attention</div></div>
@@ -2238,6 +2288,13 @@ function mgFmt(v) {
   if (v === null || v === undefined || v === '') return '<span class="mg-val-em">—</span>';
   const cls = mgColorClass(Number(v));
   return `<span class="${cls}">${v}</span>`;
+}
+
+function medToggle(btn) {
+  const panel = btn.nextElementSibling;
+  const open = panel.style.display === 'block';
+  panel.style.display = open ? 'none' : 'block';
+  btn.textContent = btn.textContent.replace(open ? '▼' : '▶', open ? '▶' : '▼');
 }
 
 async function mgAdd() {
