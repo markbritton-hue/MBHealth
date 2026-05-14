@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>MBHealth — Personal Health Dashboard</title>
-<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
@@ -547,7 +546,6 @@ onSnapshot(collection(db, COLL), snap => {
   <button class="tab"         onclick="showTab(event,'keto')">    <span class="tab-dot" style="background:#c084fc"></span>Keto Analytics</button>
   <button class="tab"         onclick="showTab(event,'visit')">   <span class="tab-dot" style="background:#38bdf8"></span>May 11 Visit</button>
   <button class="tab"         onclick="showTab(event,'fasting')"> <span class="tab-dot" style="background:#a78bfa"></span>Fasting</button>
-  <button class="tab"         onclick="showTab(event,'ai')">      <span class="tab-dot" style="background:#f472b6"></span>Ask AI</button>
 </div>
 
 <!-- ALERTS -->
@@ -1811,46 +1809,6 @@ onSnapshot(collection(db, COLL), snap => {
 
 </div><!-- /panel-fasting -->
 
-<!-- ══ ASK AI ══ -->
-<div class="panel" id="panel-ai">
-  <div style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;height:calc(100vh - 220px);min-height:500px;">
-
-    <!-- Header -->
-    <div style="text-align:center;padding:0 0 20px;">
-      <div style="font-size:2rem;margin-bottom:8px;">🤖</div>
-      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px;">Health AI</div>
-      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);">Powered by Claude · knows your labs, meds &amp; conditions</div>
-    </div>
-
-    <!-- Messages -->
-    <div id="ai-messages" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding:4px 0 16px;"></div>
-
-    <!-- Empty state -->
-    <div id="ai-empty" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--text3);font-family:'DM Mono',monospace;font-size:13px;gap:16px;">
-      <div>Ask anything about your health data</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
-        <button onclick="aiSuggest(this)" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:7px 16px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);cursor:pointer;">Is my Trig/HDL improving?</button>
-        <button onclick="aiSuggest(this)" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:7px 16px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);cursor:pointer;">What does my ApoB mean?</button>
-        <button onclick="aiSuggest(this)" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:7px 16px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);cursor:pointer;">How is my fasting helping?</button>
-        <button onclick="aiSuggest(this)" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:7px 16px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);cursor:pointer;">What should I ask my cardiologist?</button>
-        <button onclick="aiSuggest(this)" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:7px 16px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);cursor:pointer;">Explain my atrial flutter</button>
-        <button onclick="aiSuggest(this)" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:7px 16px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);cursor:pointer;">Am I on the right track?</button>
-      </div>
-    </div>
-
-    <!-- Input bar -->
-    <div style="display:flex;gap:8px;padding:14px 0 0;align-items:flex-end;flex-shrink:0;">
-      <textarea id="ai-input" rows="1" placeholder="Ask about your health data… (Enter to send, Shift+Enter for new line)"
-        style="flex:1;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:11px 16px;font-size:14px;font-family:'DM Mono',monospace;color:var(--text);resize:none;outline:none;max-height:160px;line-height:1.5;transition:border-color .15s;"
-        onfocus="this.style.borderColor='#f472b6'" onblur="this.style.borderColor=''"
-      ></textarea>
-      <button onclick="aiClear()" title="Clear chat"
-        style="background:none;border:1px solid var(--border);border-radius:10px;width:42px;height:42px;color:var(--text3);cursor:pointer;font-size:15px;flex-shrink:0;">🗑</button>
-      <button id="ai-send" onclick="aiSend()" title="Send"
-        style="background:#f472b6;border:none;border-radius:10px;width:42px;height:42px;color:#fff;cursor:pointer;font-size:18px;flex-shrink:0;transition:background .15s;">➤</button>
-    </div>
-  </div>
-</div><!-- /panel-ai -->
 
 </div><!-- /wrap -->
 
@@ -2085,10 +2043,6 @@ function showTab(evt, name) {
   }
   if (name === 'fasting') {
     requestAnimationFrame(fastInit);
-    return;
-  }
-  if (name === 'ai') {
-    requestAnimationFrame(aiInit);
     return;
   }
 
@@ -2623,198 +2577,6 @@ function mgInit() {
   mgRefresh();
 }
 
-// ─── HEALTH AI CHAT ───────────────────────────────────────────────────────────
-const AI_SYSTEM = `You are a personal health AI assistant. You have full access to this patient's health data below. Answer questions directly using their actual numbers. Be concise, practical, and always recommend confirming major decisions with their doctor.
-
-CURRENT HEALTH DATA (April 2026 labs unless noted):
-- Glucose: 144 mg/dL (high, normal 70–99)
-- HbA1c: 6.1% (prediabetes, normal <5.6%)
-- LDL: 149 mg/dL (high, target <100)
-- Total Cholesterol: 219 mg/dL (high, target <200)
-- ApoB: 108 mg/dL (high, optimal <90)
-- HDL: 51 mg/dL (normal, rising trend — was 41 in 2021)
-- Triglycerides: 97 mg/dL (normal, was 277 in 2021 — major improvement)
-- Trig/HDL ratio: 1.90 (above optimal 1.5 — insulin resistance proxy)
-- WBC: 6.7 (normal)
-- eGFR: 85 mL/min (normal)
-- TSH: 1.36 (normal)
-- BUN: 26 mg/dL (high, normal 6–20)
-- Creatinine: 1.04 mg/dL (normal)
-- BMI: 28.10, Weight: 174 lb, Height: 5'6"
-
-DIAGNOSES:
-- Atrial flutter with rapid ventricular response (diagnosed May 2026, ICD-10 I48.92)
-- Type 2 diabetes mellitus (treated without insulin)
-- Essential hypertension
-- Insulin resistance
-
-CURRENT MEDICATIONS (as of May 11, 2026):
-- Rivaroxaban 20mg (Xarelto) — once daily with dinner, for atrial flutter
-- Olmesartan-Hydrochlorothiazide 40-25mg (Benicar HCT) — once daily, for hypertension
-- Rosuvastatin (Crestor) STOPPED May 11, 2026
-
-ALLERGIES: Penicillins, Tramadol (nausea/vomiting)
-
-LIFESTYLE:
-- Diet: Carnivore (animal-based, no carbs)
-- Intermittent fasting: 18:6 — eating window 2 PM–8 PM
-- Exercise: Gym daily, finishes ~7 PM
-- Goal: Raise HDL above 60, get Trig/HDL below 1.5, improve glucose control
-
-UPCOMING:
-- CT Coronary Angiography: May 13, 2026
-- Cardiology referral: BMH Advanced Cardiac (pending)
-- Next labs (fasting): ApoB + Lipid Panel — July 29, 2026
-
-MISSING TESTS (flagged as important):
-- Fasting insulin (most important — needed for HOMA-IR)
-- hsCRP (inflammation marker)
-- Uric acid (Bikman cardiac marker)
-- ApoA1 (to complete ApoB/ApoA1 ratio)`;
-
-let aiMessages = [];
-let aiStreaming = false;
-
-function aiEsc(s) {
-  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function aiFormat(text) {
-  return aiEsc(text)
-    .replace(/```([\s\S]*?)```/g, (_,c) => `<pre style="background:var(--bg2);border-radius:6px;padding:10px 12px;overflow-x:auto;font-size:12px;margin:8px 0;white-space:pre-wrap;">${c}</pre>`)
-    .replace(/`([^`]+)`/g, (_,c) => `<code style="background:var(--bg2);padding:1px 5px;border-radius:4px;font-size:12px;">${c}</code>`)
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n/g, '<br>');
-}
-
-function aiAppend(role, content, id) {
-  const empty = document.getElementById('ai-empty');
-  if (empty) empty.style.display = 'none';
-  const container = document.getElementById('ai-messages');
-  const div = document.createElement('div');
-  div.style.cssText = 'display:flex;gap:10px;align-items:flex-start;' + (role==='user'?'flex-direction:row-reverse;':'');
-  if (id) div.id = id;
-  const avatarBg = role === 'user' ? '#f472b6' : 'rgba(244,114,182,0.15)';
-  const avatarColor = role === 'user' ? '#fff' : '#f472b6';
-  const bubbleBg = role === 'user' ? '#f472b6' : 'var(--surface)';
-  const bubbleColor = role === 'user' ? '#fff' : 'var(--text)';
-  const radius = role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px';
-  div.innerHTML = `
-    <div style="width:32px;height:32px;border-radius:50%;background:${avatarBg};color:${avatarColor};display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">${role==='user'?'👤':'🤖'}</div>
-    <div style="max-width:78%;padding:11px 15px;border-radius:${radius};background:${bubbleBg};color:${bubbleColor};font-size:14px;line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,.2);">${role==='assistant'?aiFormat(content):aiEsc(content)}</div>`;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-  return div;
-}
-
-function aiUpdateBubble(id, content) {
-  const div = document.getElementById(id);
-  if (!div) return;
-  div.querySelector('div:last-child').innerHTML = aiFormat(content);
-  document.getElementById('ai-messages').scrollTop = 99999;
-}
-
-async function aiSend(override) {
-  if (aiStreaming) return;
-  const input = document.getElementById('ai-input');
-  const text = (override || input.value).trim();
-  if (!text) return;
-
-  const apiKey = (typeof CONFIG !== 'undefined' && CONFIG.ANTHROPIC_API_KEY) || '';
-  if (!apiKey) {
-    alert('No API key found in config.js');
-    return;
-  }
-
-  input.value = '';
-  input.style.height = 'auto';
-  aiMessages.push({ role: 'user', content: text });
-  aiAppend('user', text);
-
-  aiStreaming = true;
-  document.getElementById('ai-send').disabled = true;
-
-  // Typing indicator
-  const typingId = 'ai-typing-' + Date.now();
-  const typingDiv = aiAppend('assistant', '', typingId);
-  typingDiv.querySelector('div:last-child').innerHTML = '<span style="color:var(--text3)">···</span>';
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1024,
-        system: AI_SYSTEM,
-        messages: aiMessages,
-        stream: true
-      })
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(()=>({}));
-      throw new Error(err.error?.message || `HTTP ${res.status}`);
-    }
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let reply = '';
-    let buf = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buf += decoder.decode(value, { stream: true });
-      const lines = buf.split('\n');
-      buf = lines.pop();
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        const payload = line.slice(6).trim();
-        if (payload === '[DONE]') break;
-        try {
-          const evt = JSON.parse(payload);
-          if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
-            reply += evt.delta.text;
-            aiUpdateBubble(typingId, reply);
-          }
-        } catch {}
-      }
-    }
-
-    if (reply) aiMessages.push({ role: 'assistant', content: reply });
-
-  } catch(e) {
-    aiUpdateBubble(typingId, `⚠️ Error: ${e.message}`);
-  } finally {
-    aiStreaming = false;
-    document.getElementById('ai-send').disabled = false;
-  }
-}
-
-function aiSuggest(btn) { aiSend(btn.textContent.trim()); }
-
-function aiClear() {
-  aiMessages = [];
-  document.getElementById('ai-messages').innerHTML = '';
-  document.getElementById('ai-empty').style.display = 'flex';
-}
-
-function aiInit() {
-  const input = document.getElementById('ai-input');
-  input.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 160) + 'px';
-  });
-  input.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); aiSend(); }
-  });
-}
 
 // ─── FASTING TRACKER ──────────────────────────────────────────────────────────
 const FAST_GOAL_HRS = 18;
